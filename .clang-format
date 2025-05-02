@@ -2,3 +2,8 @@ Language: Cpp
 BasedOnStyle: Microsoft
 UseTab: Never
 TabWidth: '4'
+SortIncludes: CaseInsensitive
+ColumnLimit: 120
+BreakBeforeBraces: Stroustrup
+AccessModifierOffset: -4
+IndentAccessModifiers: false
