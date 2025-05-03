@@ -1,9 +1,8 @@
 #include "WiFiManager.hpp"
 #include "LoopManager.hpp"
 
-#include "esp_attr.h"
 #include "esp_event_cxx.hpp"
-#include "esp_mac.h"
+#include "esp_now.h"
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -27,6 +26,7 @@ WiFiManager::WiFiManager()
 
 WiFiManager::~WiFiManager()
 {
+    ESP_ERROR_CHECK(esp_now_deinit());
     ESP_ERROR_CHECK(esp_netif_deinit());
 }
 
@@ -70,6 +70,12 @@ void WiFiManager::init_softap()
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_start());
+
+    ESP_ERROR_CHECK(esp_now_init());
+
+    ESP_LOGI(
+        TAG.data(), "wifi_init_softap finished. SSID:%s password:%s channel:%d", WIFI_SSID, WIFI_PASS, WIFI_CHANNEL
+    );
 }
 
 } // namespace kopter
