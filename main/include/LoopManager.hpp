@@ -1,9 +1,15 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
-#include "esp_event_api.hpp"
-#include "esp_event_cxx.hpp"
+namespace idf::event {
+
+class ESPEventLoop;
+class ESPEventReg;
+class ESPEvent;
+
+} // namespace idf::event
 
 namespace kopter {
 
@@ -27,6 +33,10 @@ public:
     {
         return m_custom_loop.get();
     }
+
+    std::unique_ptr<idf::event::ESPEventReg> register_system_event(
+        const idf::event::ESPEvent &event, std::function<void(const idf::event::ESPEvent &, void *)> cb
+    );
 
 private:
     LoopManager();

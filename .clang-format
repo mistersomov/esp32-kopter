@@ -3,6 +3,7 @@ BasedOnStyle: Microsoft
 UseTab: Never
 TabWidth: '4'
 SortIncludes: CaseInsensitive
+AlignAfterOpenBracket: BlockIndent
 ColumnLimit: 120
 BreakBeforeBraces: Stroustrup
 AccessModifierOffset: -4

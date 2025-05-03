@@ -1,4 +1,6 @@
 #include "LoopManager.hpp"
+#include "esp_event_api.hpp"
+#include "esp_event_cxx.hpp"
 #include <string_view>
 
 using namespace idf::event;
@@ -25,6 +27,15 @@ static esp_event_loop_args_t make_loop_args()
 LoopManager::LoopManager()
     : m_default_loop(std::make_shared<ESPEventLoop>(std::make_shared<ESPEventAPIDefault>())),
       m_custom_loop(std::make_shared<ESPEventLoop>(std::make_shared<ESPEventAPICustom>(make_loop_args())))
-{}
+{
+}
+
+std::unique_ptr<ESPEventReg> LoopManager::register_system_event(
+    const ESPEvent &event, std::function<void(const ESPEvent &, void *)> cb
+)
+{
+    std::unique_ptr<ESPEventReg> system_event = m_default_loop->register_event(event, cb);
+    return system_event;
+}
 
 } // namespace kopter
