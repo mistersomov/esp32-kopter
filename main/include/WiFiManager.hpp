@@ -4,7 +4,9 @@
 #include <memory>
 
 namespace idf::event {
-  class ESPEventReg;
+
+class ESPEventReg;
+
 }
 
 namespace kopter {
