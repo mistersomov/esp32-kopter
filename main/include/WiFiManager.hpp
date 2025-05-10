@@ -19,10 +19,13 @@ public:
 
     static WiFiManager &get_instance(LoopManager *p_loop_manager);
 
-    void init_softap();
+    void init();
 
 private:
     WiFiManager();
+
+    void init_esp_now();
+    void set_wifi_config();
 
     LoopManager *m_loop_manager{nullptr};
 };
