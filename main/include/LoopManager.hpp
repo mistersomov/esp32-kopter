@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LOOP_MANAGER_HPP
+#define LOOP_MANAGER_HPP
 
 #include <functional>
 #include <memory>
@@ -47,3 +48,5 @@ private:
 };
 
 } // namespace kopter
+
+#endif
