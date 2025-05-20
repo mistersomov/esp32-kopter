@@ -1,13 +1,13 @@
 #include "WiFiManager.hpp"
+#include "event/WiFiEvents.hpp"
 #include "LoopManager.hpp"
 
-#include "esp_event_cxx.hpp"
 #include "esp_now.h"
-#include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "string.h"
 #include <cstring>
+#include <memory>
 #include <string_view>
 
 using namespace idf::event;
@@ -29,6 +29,7 @@ using namespace idf::event;
 #define LMK CONFIG_LMK
 
 namespace kopter {
+std::unique_ptr<ESPEventReg> wifi_started_event_reg;
 
 constexpr std::string_view TAG = "[WiFiManager]";
 
@@ -77,6 +78,10 @@ void WiFiManager::init()
 
     ESP_ERROR_CHECK(esp_netif_init());
 
+    wifi_started_event_reg = m_loop_manager->register_system_event(event::WIFI_STARTED, [](const ESPEvent &, void *) {
+        ESP_ERROR_CHECK(esp_wifi_connect());
+    });
+
 #if WIFI_MODE_STATION_SOFTAP
     esp_netif_create_default_wifi_ap();
 #else
@@ -86,11 +91,6 @@ void WiFiManager::init()
     set_wifi_config();
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_start());
-
-#if CONFIG_WIFI_MODE_STATION
-    ESP_ERROR_CHECK(esp_wifi_connect());
-#endif
-
     init_esp_now();
 }
 
