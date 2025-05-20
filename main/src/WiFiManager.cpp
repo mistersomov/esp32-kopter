@@ -88,6 +88,10 @@ void WiFiManager::init()
     ));
 #endif
 
+#if CONFIG_WIFI_MODE_STATION
+    ESP_ERROR_CHECK(esp_wifi_connect());
+#endif
+
     init_esp_now();
 }
 
@@ -125,6 +129,7 @@ void WiFiManager::set_wifi_config()
     ESP_ERROR_CHECK(esp_wifi_init(&init_cfg));
 
     wifi_config_t cfg = {};
+
 #if CONFIG_WIFI_MODE_STATION_SOFT_AP
     strcpy(reinterpret_cast<char *>(cfg.ap.ssid), WIFI_SSID);
     strcpy(reinterpret_cast<char *>(cfg.ap.password), WIFI_PASS);
@@ -134,18 +139,14 @@ void WiFiManager::set_wifi_config()
     cfg.ap.sae_pwe_h2e = WPA3_SAE_PWE_BOTH;
     cfg.ap.max_connection = WIFI_MAX_STA_CONN;
     cfg.ap.pmf_cfg.required = true;
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
 #else
     strcpy(reinterpret_cast<char *>(cfg.sta.ssid), WIFI_SSID);
     strcpy(reinterpret_cast<char *>(cfg.sta.password), WIFI_PASS);
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 #endif
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESPNOW_WIFI_IF, &cfg));
-
-#if CONFIG_WIFI_MODE_STATION
-    ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_ERROR_CHECK(esp_wifi_connect());
-#endif
 }
 
 } // namespace kopter
