@@ -5,7 +5,7 @@ if (NOT target)
 endif()
 
 idf_component_register(
-    SRC_DIRS src
+    SRC_DIRS src src/manager
     INCLUDE_DIRS include
     PRIV_REQUIRES esp_event esp_wifi nvs_flash
 )

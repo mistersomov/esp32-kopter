@@ -1,6 +1,6 @@
-#include "WiFiManager.hpp"
+#include "manager/WiFiManager.hpp"
 #include "event/WiFiEvents.hpp"
-#include "LoopManager.hpp"
+#include "manager/LoopManager.hpp"
 #include "Message.hpp"
 
 #include "nvs.h"
