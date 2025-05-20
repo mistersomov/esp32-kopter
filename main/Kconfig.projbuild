@@ -8,7 +8,7 @@ menu "Kopter Conifiguration"
 
         config WIFI_MODE_STATION
             bool "Station"
-        config WIFI_MODE_STATION_SOFTAP
+        config WIFI_MODE_SOFTAP
             bool "Softap"
     endchoice
 

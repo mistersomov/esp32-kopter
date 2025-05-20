@@ -15,7 +15,7 @@ using namespace idf::event;
 #define WIFI_SSID CONFIG_AP_WIFI_SSID
 #define WIFI_PASS CONFIG_AP_WIFI_PASSWORD
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
-#if CONFIG_WIFI_MODE_STATION_SOFTAP
+#if CONFIG_WIFI_MODE_SOFTAP
 #define WIFI_MAX_STA_CONN CONFIG_AP_MAX_STA_CONN
 #define WIFI_MODE WIFI_MODE_AP
 #define ESPNOW_WIFI_IF WIFI_IF_AP
@@ -47,6 +47,11 @@ WiFiManager::WiFiManager()
 WiFiManager::~WiFiManager()
 {
     ESP_ERROR_CHECK(esp_now_deinit());
+
+#if CONFIG_WIFI_MODE_STATION
+    ESP_ERROR_CHECK(esp_wifi_disconnect());
+#endif
+
     ESP_ERROR_CHECK(esp_wifi_stop());
     ESP_ERROR_CHECK(esp_netif_deinit());
 }
@@ -72,7 +77,7 @@ void WiFiManager::init()
 
     ESP_ERROR_CHECK(esp_netif_init());
 
-#if CONFIG_WIFI_MODE_STATION_SOFT_AP
+#if WIFI_MODE_STATION_SOFTAP
     esp_netif_create_default_wifi_ap();
 #else
     esp_netif_create_default_wifi_sta();
@@ -81,12 +86,6 @@ void WiFiManager::init()
     set_wifi_config();
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_start());
-
-#if CONFIG_ENABLE_LONG_RANGE
-    ESP_ERROR_CHECK(esp_wifi_set_protocol(
-        ESPNOW_WIFI_IF, WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G | WIFI_PROTOCOL_11N | WIFI_PROTOCOL_LR
-    ));
-#endif
 
 #if CONFIG_WIFI_MODE_STATION
     ESP_ERROR_CHECK(esp_wifi_connect());
@@ -130,7 +129,7 @@ void WiFiManager::set_wifi_config()
 
     wifi_config_t cfg = {};
 
-#if CONFIG_WIFI_MODE_STATION_SOFT_AP
+#if WIFI_MODE_STATION_SOFTAP
     strcpy(reinterpret_cast<char *>(cfg.ap.ssid), WIFI_SSID);
     strcpy(reinterpret_cast<char *>(cfg.ap.password), WIFI_PASS);
     cfg.ap.ssid_len = strlen(WIFI_SSID);
@@ -139,13 +138,12 @@ void WiFiManager::set_wifi_config()
     cfg.ap.sae_pwe_h2e = WPA3_SAE_PWE_BOTH;
     cfg.ap.max_connection = WIFI_MAX_STA_CONN;
     cfg.ap.pmf_cfg.required = true;
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
 #else
     strcpy(reinterpret_cast<char *>(cfg.sta.ssid), WIFI_SSID);
     strcpy(reinterpret_cast<char *>(cfg.sta.password), WIFI_PASS);
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 #endif
 
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESPNOW_WIFI_IF, &cfg));
 }
 
