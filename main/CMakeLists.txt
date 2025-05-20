@@ -10,4 +10,4 @@ idf_component_register(
     PRIV_REQUIRES esp_event esp_wifi nvs_flash
 )
 
-target_compile_options(${COMPONENT_LIB} PRIVATE -fexceptions)
+target_compile_options(${COMPONENT_LIB} PRIVATE -std=c++20 -fexceptions)
