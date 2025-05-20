@@ -8,17 +8,10 @@
 
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP
-#define WIFI_MAX_STA_CONN CONFIG_AP_MAX_STA_CONN
-#define WIFI_MODE WIFI_MODE_AP
 #define ESPNOW_WIFI_IF WIFI_IF_AP
-#define ESPNOW_PEER_MAC ESP_MAC_WIFI_STA
 #else
-#define WIFI_MODE WIFI_MODE_STA
 #define ESPNOW_WIFI_IF WIFI_IF_STA
-#define ESPNOW_PEER_MAC ESP_MAC_WIFI_SOFTAP
 #endif
-#define PMK CONFIG_PMK
-#define LMK CONFIG_LMK
 
 namespace kopter {
 
@@ -53,7 +46,6 @@ void MessageManager::init()
     ESP_ERROR_CHECK(esp_now_register_send_cb(esp_now_send_cb));
     ESP_ERROR_CHECK(esp_now_register_recv_cb(esp_now_rv_cb));
     ESP_ERROR_CHECK(add_broadcast_peer());
-    ESP_ERROR_CHECK(esp_now_set_pmk(reinterpret_cast<const uint8_t *>(PMK)));
 }
 
 void MessageManager::send_message(Message *msg) const
