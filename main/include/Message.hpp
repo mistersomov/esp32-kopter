@@ -9,24 +9,23 @@ namespace kopter {
 
 __attribute__((packed)) struct Message {
     int16_t data;
-    std::array<uint8_t, 6> dest_mac;
 
     static constexpr size_t size()
     {
-        return sizeof(int16_t) + 6;
+        return sizeof(int16_t);
     }
 
-    static Message deserialize(const uint16_t *buffer)
+    static Message deserialize(const uint8_t *buffer)
     {
         Message message;
-        std::memcpy(&message.data, buffer, sizeof(&message.data));
-        std::memcpy(&message.dest_mac, buffer + sizeof(message.data), message.dest_mac.size());
+        std::memcpy(&message.data, buffer, sizeof(message.data));
+
+        return message;
     }
 
-    void serialize(uint16_t *buffer) const
+    void serialize(uint8_t *buffer) const
     {
         std::memcpy(buffer, &data, sizeof(data));
-        std::memcpy(buffer + sizeof(data), dest_mac.data(), dest_mac.size());
     }
 };
 

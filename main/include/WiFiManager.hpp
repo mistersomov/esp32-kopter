@@ -1,8 +1,6 @@
 #ifndef WIFI_MANAGER_HPP
 #define WIFI_MANAGER_HPP
 
-#include "esp_err.h"
-
 namespace idf::event {
 
 class ESPEventReg;
@@ -26,8 +24,6 @@ public:
 private:
     WiFiManager();
 
-    void init_esp_now();
-    esp_err_t add_broadcast_peer();
     void set_wifi_config();
 
     LoopManager *m_loop_manager{nullptr};
