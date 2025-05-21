@@ -1,10 +1,10 @@
 sdkconfig
 sdkconfig.defaults
 sdkconfig.old
+dependencies.lock
 
 .DS_Store
 .vscode
-.lock
 
 /build
 *.bin
