@@ -9,3 +9,4 @@ BreakBeforeBraces: Stroustrup
 AccessModifierOffset: -4
 IndentAccessModifiers: false
 BinPackArguments: false
+AllowAllArgumentsOnNextLine: false
