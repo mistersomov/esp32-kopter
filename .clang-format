@@ -8,3 +8,4 @@ ColumnLimit: 120
 BreakBeforeBraces: Stroustrup
 AccessModifierOffset: -4
 IndentAccessModifiers: false
+BinPackArguments: false
