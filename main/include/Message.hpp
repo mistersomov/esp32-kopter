@@ -4,9 +4,7 @@
 #include "CoreTypes.hpp"
 
 #include <algorithm>
-#include <array>
 #include <cstdint>
-#include <cstring>
 
 namespace kopter {
 
