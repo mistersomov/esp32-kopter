@@ -4,6 +4,7 @@ sdkconfig.old
 
 .DS_Store
 .vscode
+.lock
 
 /build
 *.bin
