@@ -1,12 +1,10 @@
 #ifndef MESSAGE_MANAGER_HPP
 #define MESSAGE_MANAGER_HPP
 
-#include "CoreTypes.hpp"
+#include "peripheral/DeviceID.hpp"
 
 #include "esp_now.h"
-#include "freertos/FreeRTOS.h"
 
-#include <functional>
 #include <unordered_map>
 
 namespace kopter {

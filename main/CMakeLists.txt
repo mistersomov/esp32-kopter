@@ -5,9 +5,9 @@ if (NOT target)
 endif()
 
 idf_component_register(
-    SRC_DIRS src src/manager
+    SRC_DIRS src src/manager src/peripheral
     INCLUDE_DIRS include
-    PRIV_REQUIRES esp_event esp_wifi nvs_flash
+    PRIV_REQUIRES esp_event esp_wifi nvs_flash esp_adc
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -std=c++20 -fexceptions)

@@ -1,8 +1,7 @@
-#ifndef CORE_TYPES_HPP
-#define CORE_TYPES_HPP
+#ifndef DEVICE_ID_HPP
+#define DEVICE_ID_HPP
 
 namespace kopter {
-
 enum class DeviceID : char {
     ROLL,
     PITCH
