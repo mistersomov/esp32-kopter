@@ -3,12 +3,11 @@
 #include "Task.hpp"
 
 #include "esp_log.h"
-#include "gpio_cxx.hpp"
 
+#include <array>
 #include <string_view>
 
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
-#define ESPNOW_QUEUE_SIZE 6
 #if CONFIG_WIFI_MODE_SOFTAP
 #define ESPNOW_WIFI_IF WIFI_IF_AP
 #else
@@ -25,22 +24,19 @@ static uint8_t dest_mac[ESP_NOW_ETH_ALEN] = {0xc8, 0xf0, 0x9e, 0xb2, 0x36, 0xfd}
 
 namespace kopter {
 
-static constexpr std::string_view MESSAGE_TASK_NAME = "msg_task";
+static constexpr uint8_t MESSAGE_QUEUE_SIZE = 6;
+static constexpr std::string_view RECV_MESSAGE_TASK_NAME = "msg_task";
 static constexpr std::string_view TAG = "[MessageManager]";
-
-MessageManager::MessageManager()
-{
-}
 
 MessageManager::~MessageManager()
 {
-    if (m_receive_task) {
-        delete m_receive_task;
-        m_receive_task = nullptr;
+    if (m_recv_task) {
+        delete m_recv_task;
+        m_recv_task = nullptr;
     }
-    if (m_queue) {
-        vQueueDelete(m_queue);
-        m_queue = nullptr;
+    if (m_msg_queue) {
+        vQueueDelete(m_msg_queue);
+        m_msg_queue = nullptr;
     }
     ESP_ERROR_CHECK(esp_now_deinit());
 }
@@ -53,73 +49,62 @@ MessageManager &MessageManager::get_instance()
 
 void MessageManager::init()
 {
-    m_queue = xQueueCreate(ESPNOW_QUEUE_SIZE, sizeof(Message));
-    if (m_queue == nullptr) {
+    m_msg_queue = xQueueCreate(MESSAGE_QUEUE_SIZE, sizeof(Message *));
+    if (m_msg_queue == nullptr) {
         ESP_LOGE(TAG.data(), "Creating messages queue fail");
         return;
     }
 
-    s_callback_instance = this;
+    m_callback_instance = this;
 
     ESP_ERROR_CHECK(esp_now_init());
     ESP_ERROR_CHECK(esp_now_register_send_cb(esp_now_send_cb));
     ESP_ERROR_CHECK(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
     ESP_ERROR_CHECK(add_peer_to_list());
-
-    m_receive_task = new Task(MESSAGE_TASK_NAME.data(), [this]() {
-        Message msg;
-        auto led = idf::GPIO_Output(idf::GPIONum(2));
-
-        while (true) {
-            if (xQueueReceive(m_queue, &msg, portMAX_DELAY)) {
-                ESP_LOGI(TAG.data(), "Received msg id=%d", static_cast<int>(msg.sensor_id));
-                if (msg.sensor_id == SensorID::PITCH) {
-                    led.set_high();
-                }
-                else if (msg.sensor_id == SensorID::ROLL) {
-                    led.set_low();
-                }
-            }
-        }
-    });
+    create_msg_receive_task();
 }
 
-void MessageManager::send_message(Message *msg) const
+void MessageManager::register_callback(DeviceID id, recv_callback cb)
 {
-    uint8_t buffer[Message::size()];
-    msg->serialize(buffer);
-
-    esp_err_t result = esp_now_send(dest_mac, buffer, sizeof(buffer));
-    if (result == ESP_OK) {
-        ESP_LOGI(TAG.data(), "Message sent successfully");
-    }
-    else {
-        ESP_LOGE(TAG.data(), "Failed to send message: %d\n", result);
+    if (m_recv_callbacks.find(id) == m_recv_callbacks.end()) {
+        m_recv_callbacks[id] = std::move(cb);
     }
 }
 
-void MessageManager::esp_now_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
+void MessageManager::send_message(const Message &msg) const
+{
+    std::array<uint8_t, Message::size()> buffer;
+    esp_err_t ret;
+
+    msg.serialize(buffer.data());
+    ret = esp_now_send(dest_mac, buffer.data(), sizeof(buffer));
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG.data(), "Failed to sending message: %s", esp_err_to_name(ret));
+    }
+}
+
+IRAM_ATTR void MessageManager::esp_now_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
 }
 
-void MessageManager::esp_now_recv_cb_forwarder(const esp_now_recv_info_t *info, const uint8_t *data, int len)
+IRAM_ATTR void MessageManager::esp_now_recv_cb_forwarder(const esp_now_recv_info_t *info, const uint8_t *data, int len)
 {
-    if (MessageManager::s_callback_instance) {
-        MessageManager::s_callback_instance->handle_recv(info, data, len);
+    if (MessageManager::m_callback_instance) {
+        MessageManager::m_callback_instance->handle_recv(info, data, len);
     }
 }
 
 void MessageManager::handle_recv(const esp_now_recv_info_t *info, const uint8_t *data, int len)
 {
     if (len < Message::size()) {
-        ESP_LOGE(TAG.data(), "Error length received data");
+        ESP_LOGE(TAG.data(), "The resulting data is of incorrect length");
         return;
     }
 
-    Message msg = Message::deserialize(data);
+    Message *msg = new Message(Message::deserialize(data));
     BaseType_t task_woken = pdFALSE;
 
-    xQueueSendFromISR(m_queue, &msg, &task_woken);
+    xQueueSendFromISR(m_msg_queue, &msg, &task_woken);
 
     if (task_woken) {
         portYIELD_FROM_ISR();
@@ -137,4 +122,20 @@ esp_err_t MessageManager::add_peer_to_list() const
     return esp_now_add_peer(&peer_info);
 }
 
+void MessageManager::create_msg_receive_task()
+{
+    m_recv_task = new Task(RECV_MESSAGE_TASK_NAME.data(), [this]() {
+        Message *msg;
+
+        while (true) {
+            if (xQueueReceive(m_msg_queue, &msg, portMAX_DELAY)) {
+                auto itt = m_recv_callbacks.find(msg->device_id);
+                if (itt != m_recv_callbacks.end()) {
+                    itt->second(*msg);
+                }
+            }
+            delete msg;
+        }
+    });
+}
 } // namespace kopter

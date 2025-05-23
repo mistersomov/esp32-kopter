@@ -3,7 +3,7 @@
 
 namespace kopter {
 
-enum class SensorID : char {
+enum class DeviceID : char {
     ROLL,
     PITCH
 };
