@@ -1,9 +1,6 @@
 #ifndef LOOP_MANAGER_HPP
 #define LOOP_MANAGER_HPP
 
-#include <functional>
-#include <memory>
-
 namespace idf::event {
 
 class ESPEventLoop;

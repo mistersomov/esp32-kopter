@@ -1,11 +1,8 @@
+#include "pch.hpp"
+
 #include "manager/MessageManager.hpp"
 #include "Message.hpp"
 #include "Task.hpp"
-
-#include "esp_log.h"
-
-#include <array>
-#include <string_view>
 
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP

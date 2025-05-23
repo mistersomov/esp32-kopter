@@ -1,10 +1,7 @@
 #ifndef TASK_HPP
 #define TASK_HPP
 
-#include "freertos/FreeRTOS.h"
-
-#include <cstdint>
-#include <functional>
+#include "pch.hpp"
 
 namespace kopter {
 

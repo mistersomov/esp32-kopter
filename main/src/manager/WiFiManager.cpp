@@ -1,13 +1,12 @@
+#include "pch.hpp"
 #include "manager/WiFiManager.hpp"
+
 #include "event/WiFiEvents.hpp"
 #include "manager/LoopManager.hpp"
 #include "Message.hpp"
 
 #include "nvs.h"
 #include "nvs_flash.h"
-#include "string.h"
-#include <cstring>
-#include <string_view>
 
 using namespace idf::event;
 

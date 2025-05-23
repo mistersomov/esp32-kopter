@@ -2,7 +2,6 @@ Language: Cpp
 BasedOnStyle: Microsoft
 UseTab: Never
 TabWidth: '4'
-SortIncludes: CaseInsensitive
 AlignAfterOpenBracket: BlockIndent
 ColumnLimit: 120
 BreakBeforeBraces: Stroustrup
@@ -10,3 +9,16 @@ AccessModifierOffset: -4
 IndentAccessModifiers: false
 BinPackArguments: false
 AllowAllArgumentsOnNextLine: false
+IncludeCategories:
+  - Regex:           "^\"pch.hpp\"$"
+    Priority:        0
+    SortPriority:    0
+    CaseSensitive:   true
+  - Regex:           '^"[^"]+"$'
+    Priority:        1
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           "^<.*>"
+    Priority:        2
+SortIncludes: CaseInsensitive
+IncludeBlocks: Preserve

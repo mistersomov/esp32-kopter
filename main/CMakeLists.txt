@@ -11,3 +11,4 @@ idf_component_register(
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -std=c++20 -fexceptions)
+target_precompile_headers(${COMPONENT_LIB} PRIVATE include/pch.hpp)
