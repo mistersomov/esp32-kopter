@@ -1,10 +1,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include "CoreTypes.hpp"
-
-#include <algorithm>
-#include <cstdint>
+#include "peripheral/DeviceID.hpp"
 
 namespace kopter {
 
