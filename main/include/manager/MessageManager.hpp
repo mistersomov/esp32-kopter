@@ -16,7 +16,6 @@ class MessageManager {
 public:
     using recv_callback = std::function<void(const Message &msg)>;
 
-    MessageManager() = default;
     MessageManager(const MessageManager &) = delete;
     MessageManager &operator=(const MessageManager &) = delete;
     ~MessageManager();
@@ -28,6 +27,8 @@ public:
     void send_message(const Message &msg) const;
 
 private:
+    MessageManager() = default;
+
     IRAM_ATTR static void esp_now_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
     IRAM_ATTR static void esp_now_recv_cb_forwarder(const esp_now_recv_info_t *info, const uint8_t *data, int len);
 

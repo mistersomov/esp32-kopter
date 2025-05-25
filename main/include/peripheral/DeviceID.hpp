@@ -4,7 +4,8 @@
 namespace kopter {
 enum class DeviceID : char {
     ROLL,
-    PITCH
+    PITCH,
+    CONTROLLER
 };
 } // namespace kopter
 
