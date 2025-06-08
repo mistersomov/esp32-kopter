@@ -22,12 +22,11 @@ public:
 
     static MessageManager &get_instance();
 
-    void init();
     void register_callback(DeviceID id, recv_callback cb);
     void send_message(const Message &msg) const;
 
 private:
-    MessageManager() = default;
+    MessageManager();
 
     IRAM_ATTR static void esp_now_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
     IRAM_ATTR static void esp_now_recv_cb_forwarder(const esp_now_recv_info_t *info, const uint8_t *data, int len);

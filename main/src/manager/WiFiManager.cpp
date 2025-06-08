@@ -1,14 +1,16 @@
 #include "pch.hpp"
-#include "manager/WiFiManager.hpp"
 
 #include "event/WiFiEvents.hpp"
 #include "manager/LoopManager.hpp"
+#include "manager/WiFiManager.hpp"
 #include "Message.hpp"
 
 #include "nvs.h"
 #include "nvs_flash.h"
 
 using namespace idf::event;
+
+namespace kopter {
 
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP
@@ -17,20 +19,28 @@ using namespace idf::event;
 #define WIFI_MODE WIFI_MODE_STA
 #endif
 
-namespace kopter {
-
 constexpr std::string_view TAG = "[WiFiManager]";
 
 WiFiManager::WiFiManager()
 {
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        CHECK_THROW(nvs_flash_erase());
+        CHECK_THROW(nvs_flash_init());
+    }
+
+    set_wifi_config();
+    CHECK_THROW(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    CHECK_THROW(esp_wifi_start());
+    CHECK_THROW(esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE));
 }
 
 WiFiManager::~WiFiManager()
 {
 #if CONFIG_WIFI_MODE_STATION
-    ESP_ERROR_CHECK(esp_wifi_disconnect());
+    CHECK_THROW(esp_wifi_disconnect());
 #endif
-    ESP_ERROR_CHECK(esp_wifi_stop());
+    CHECK_THROW(esp_wifi_stop());
 }
 
 WiFiManager &WiFiManager::get_instance(LoopManager *p_loop_manager)
@@ -44,25 +54,11 @@ WiFiManager &WiFiManager::get_instance(LoopManager *p_loop_manager)
     return instance;
 }
 
-void WiFiManager::init()
-{
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ESP_ERROR_CHECK(nvs_flash_init());
-    }
-
-    set_wifi_config();
-    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-    ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_ERROR_CHECK(esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE));
-}
-
 void WiFiManager::set_wifi_config()
 {
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&init_cfg));
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE));
+    CHECK_THROW(esp_wifi_init(&init_cfg));
+    CHECK_THROW(esp_wifi_set_mode(WIFI_MODE));
 }
 
 } // namespace kopter

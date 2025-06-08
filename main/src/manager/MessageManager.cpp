@@ -25,6 +25,23 @@ static constexpr uint8_t MESSAGE_QUEUE_SIZE = 6;
 static constexpr std::string_view RECV_MESSAGE_TASK_NAME = "msg_task";
 static constexpr std::string_view TAG = "[MessageManager]";
 
+MessageManager::MessageManager()
+{
+    m_msg_queue = xQueueCreate(MESSAGE_QUEUE_SIZE, sizeof(Message *));
+    if (m_msg_queue == nullptr) {
+        ESP_LOGE(TAG.data(), "Creating messages queue fail");
+        return;
+    }
+
+    m_callback_instance = this;
+
+    CHECK_THROW(esp_now_init());
+    CHECK_THROW(esp_now_register_send_cb(esp_now_send_cb));
+    CHECK_THROW(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
+    CHECK_THROW(add_peer_to_list());
+    create_msg_receive_task();
+}
+
 MessageManager::~MessageManager()
 {
     if (m_recv_task) {
@@ -35,30 +52,13 @@ MessageManager::~MessageManager()
         vQueueDelete(m_msg_queue);
         m_msg_queue = nullptr;
     }
-    ESP_ERROR_CHECK(esp_now_deinit());
+    CHECK_THROW(esp_now_deinit());
 }
 
 MessageManager &MessageManager::get_instance()
 {
     static MessageManager instance;
     return instance;
-}
-
-void MessageManager::init()
-{
-    m_msg_queue = xQueueCreate(MESSAGE_QUEUE_SIZE, sizeof(Message *));
-    if (m_msg_queue == nullptr) {
-        ESP_LOGE(TAG.data(), "Creating messages queue fail");
-        return;
-    }
-
-    m_callback_instance = this;
-
-    ESP_ERROR_CHECK(esp_now_init());
-    ESP_ERROR_CHECK(esp_now_register_send_cb(esp_now_send_cb));
-    ESP_ERROR_CHECK(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
-    ESP_ERROR_CHECK(add_peer_to_list());
-    create_msg_receive_task();
 }
 
 void MessageManager::register_callback(DeviceID id, recv_callback cb)

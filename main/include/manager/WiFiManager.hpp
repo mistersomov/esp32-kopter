@@ -19,8 +19,6 @@ public:
 
     static WiFiManager &get_instance(LoopManager *p_loop_manager);
 
-    void init();
-
 private:
     WiFiManager();
 
