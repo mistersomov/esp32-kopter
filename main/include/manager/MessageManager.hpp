@@ -17,7 +17,7 @@
 #ifndef MESSAGE_MANAGER_HPP
 #define MESSAGE_MANAGER_HPP
 
-#include "peripheral/DeviceID.hpp"
+#include "DeviceID.hpp"
 
 #include "esp_now.h"
 

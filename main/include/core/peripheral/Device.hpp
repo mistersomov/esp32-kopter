@@ -14,15 +14,28 @@
  limitations under the License.
  */
 
-#ifndef DEVICE_ID_HPP
-#define DEVICE_ID_HPP
+#ifndef DEVICE_HPP
+#define DEVICE_HPP
 
 namespace kopter {
-enum class DeviceID : char {
-    ROLL,
-    PITCH,
-    CONTROLLER
+
+class Device {
+public:
+    Device(const std::string &name) : m_tag{"[" + name + "]"}, m_name{std::move(name)}
+    {
+    }
+    virtual ~Device() = default;
+
+    const std::string &get_tag() const noexcept
+    {
+        return m_tag;
+    }
+
+private:
+    std::string m_tag;
+    std::string m_name;
 };
+
 } // namespace kopter
 
 #endif

@@ -14,14 +14,32 @@
  limitations under the License.
  */
 
-#ifndef DEVICE_ADC_MODE_HPP
-#define DEVICE_ADC_MODE_HPP
+#ifndef MOTOR_HPP
+#define MOTOR_HPP
+
+#include "bdc_motor.h"
+#include "pid_ctrl.h"
 
 namespace kopter {
-enum class DeviceAdcMode : char {
-    ONE_SHOT,
-    CONTINUOUS
+
+class Motor {
+public:
+    explicit Motor(const uint8_t &gpio);
+    ~Motor();
+
+    void enable();
+    void disable();
+    void forward();
+    void set_speed(uint16_t speed);
+
+private:
+    void init_motor(const uint8_t &gpio);
+    void init_pid();
+
+    pid_ctrl_block_handle_t m_pid{nullptr};
+    bdc_motor_handle_t m_motor{nullptr};
 };
+
 } // namespace kopter
 
 #endif

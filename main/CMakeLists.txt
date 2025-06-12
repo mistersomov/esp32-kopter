@@ -4,9 +4,12 @@ if (NOT target)
     message(WARNING "IDF_TARGET not set, defaulting to esp32")
 endif()
 
+set(srcdirs "src" "src/core/peripheral" "src/core/peripheral/adc" "src/manager" "src/motor")
+set(includedirs "include" "include/core" "include/core/peripheral" "include/core/peripheral/adc" "include/manager")
+
 idf_component_register(
-    SRC_DIRS src src/manager src/peripheral
-    INCLUDE_DIRS include
+    SRC_DIRS ${srcdirs}
+    INCLUDE_DIRS ${includedirs}
     PRIV_REQUIRES esp_event esp_wifi nvs_flash esp_adc
 )
 

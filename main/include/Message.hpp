@@ -17,7 +17,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include "peripheral/DeviceID.hpp"
+#include "DeviceID.hpp"
 
 namespace kopter {
 
@@ -41,16 +41,12 @@ struct [[gnu::packed]] Message {
 
     void serialize(uint8_t *buffer) const
     {
-        std::copy(
-            reinterpret_cast<const uint8_t *>(&device_id),
-            reinterpret_cast<const uint8_t *>(&device_id) + sizeof(device_id),
-            buffer
-        );
-        std::copy(
-            reinterpret_cast<const uint8_t *>(&data),
-            reinterpret_cast<const uint8_t *>(&data) + sizeof(data),
-            buffer + sizeof(device_id)
-        );
+        std::copy(reinterpret_cast<const uint8_t *>(&device_id),
+                  reinterpret_cast<const uint8_t *>(&device_id) + sizeof(device_id),
+                  buffer);
+        std::copy(reinterpret_cast<const uint8_t *>(&data),
+                  reinterpret_cast<const uint8_t *>(&data) + sizeof(data),
+                  buffer + sizeof(device_id));
     }
 };
 
