@@ -27,6 +27,7 @@
 using namespace idf::event;
 
 namespace kopter {
+#define WIFI_CHECK_THROW(err) CHECK_THROW_WITH(err, WiFiException)
 
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP
@@ -37,26 +38,30 @@ namespace kopter {
 
 constexpr std::string_view TAG = "[WiFiManager]";
 
+WiFiException::WiFiException(esp_err_t error) : KopterException(error)
+{
+}
+
 WiFiManager::WiFiManager()
 {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        CHECK_THROW(nvs_flash_erase());
-        CHECK_THROW(nvs_flash_init());
+        WIFI_CHECK_THROW(nvs_flash_erase());
+        WIFI_CHECK_THROW(nvs_flash_init());
     }
 
     set_wifi_config();
-    CHECK_THROW(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-    CHECK_THROW(esp_wifi_start());
-    CHECK_THROW(esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE));
+    WIFI_CHECK_THROW(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    WIFI_CHECK_THROW(esp_wifi_start());
+    WIFI_CHECK_THROW(esp_wifi_set_channel(WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE));
 }
 
 WiFiManager::~WiFiManager()
 {
 #if CONFIG_WIFI_MODE_STATION
-    CHECK_THROW(esp_wifi_disconnect());
+    WIFI_CHECK_THROW(esp_wifi_disconnect());
 #endif
-    CHECK_THROW(esp_wifi_stop());
+    WIFI_CHECK_THROW(esp_wifi_stop());
 }
 
 WiFiManager &WiFiManager::get_instance(LoopManager *p_loop_manager)
@@ -73,8 +78,8 @@ WiFiManager &WiFiManager::get_instance(LoopManager *p_loop_manager)
 void WiFiManager::set_wifi_config()
 {
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
-    CHECK_THROW(esp_wifi_init(&init_cfg));
-    CHECK_THROW(esp_wifi_set_mode(WIFI_MODE));
+    WIFI_CHECK_THROW(esp_wifi_init(&init_cfg));
+    WIFI_CHECK_THROW(esp_wifi_set_mode(WIFI_MODE));
 }
 
 } // namespace kopter

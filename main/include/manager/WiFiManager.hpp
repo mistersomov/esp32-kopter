@@ -27,6 +27,10 @@ namespace kopter {
 
 class LoopManager;
 
+struct WiFiException : public KopterException {
+    WiFiException(esp_err_t error);
+};
+
 class WiFiManager {
 public:
     WiFiManager(const WiFiManager &) = delete;
