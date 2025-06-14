@@ -67,7 +67,7 @@ Device *AdcDeviceHolder::add_device(const std::string &name,
 {
     assert(m_continuous_handler);
 
-    if (m_devices.find(name) != m_devices.end()) {
+    if (m_devices.find(name) != m_devices.end()) { // TODO Apply channel checking and etc.
         return m_devices[name].get();
     }
 
