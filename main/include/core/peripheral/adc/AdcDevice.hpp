@@ -14,23 +14,25 @@
  limitations under the License.
  */
 
-#ifndef PCH_HPP
-#define PCH_HPP
+#ifndef ADC_DEVICE_HPP
+#define ADC_DEVICE_HPP
 
-#include "KopterException.hpp"
+#include "Device.hpp"
+#include "IAdcReadStrategy.hpp"
 
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
+namespace kopter {
 
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <unordered_set>
-#include <vector>
+class AdcDevice : public Device {
+public:
+    AdcDevice(const std::string &name, std::unique_ptr<IAdcReadStrategy> strategy);
+    virtual ~AdcDevice();
+
+    void read(reading_callback cb);
+
+private:
+    std::unique_ptr<IAdcReadStrategy> m_read_strategy{nullptr};
+};
+
+} // namespace kopter
 
 #endif

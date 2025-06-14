@@ -14,23 +14,14 @@
  limitations under the License.
  */
 
-#ifndef PCH_HPP
-#define PCH_HPP
+#pragma once
 
-#include "KopterException.hpp"
+namespace kopter {
 
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
+#define ADC_CHECK_THROW(err) CHECK_THROW_WITH(err, AdcException)
 
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <unordered_set>
-#include <vector>
+struct AdcException : public KopterException {
+    AdcException(esp_err_t error);
+};
 
-#endif
+} // namespace kopter

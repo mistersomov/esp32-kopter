@@ -14,23 +14,28 @@
  limitations under the License.
  */
 
-#ifndef PCH_HPP
-#define PCH_HPP
+#include "pch.hpp"
+#include "AdcDevice.hpp"
+#include "AdcException.hpp"
 
-#include "KopterException.hpp"
+namespace kopter {
 
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
+AdcDevice::AdcDevice(const std::string &name, std::unique_ptr<IAdcReadStrategy> strategy)
+    : Device{name}, m_read_strategy{std::move(strategy)}
+{
+}
 
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <unordered_set>
-#include <vector>
+AdcDevice::~AdcDevice()
+{
+}
 
-#endif
+void AdcDevice::read(reading_callback cb)
+{
+    if (!m_read_strategy) {
+        ESP_LOGE(get_tag().c_str(), "Read strategy not set.");
+        throw AdcException(ESP_ERR_INVALID_STATE);
+    }
+    m_read_strategy->read(cb);
+}
+
+} // namespace kopter

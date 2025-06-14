@@ -14,23 +14,14 @@
  limitations under the License.
  */
 
-#ifndef PCH_HPP
-#define PCH_HPP
+#ifndef ADC_MODE_HPP
+#define ADC_MODE_HPP
 
-#include "KopterException.hpp"
-
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <unordered_set>
-#include <vector>
+namespace kopter {
+enum class AdcMode : char {
+    ONE_SHOT,
+    CONTINUOUS
+};
+} // namespace kopter
 
 #endif

@@ -1,0 +1,186 @@
+/*
+ Copyright 2025 Ivan Somov
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+#include "pch.hpp"
+#include "AdcDeviceHolder.hpp"
+
+#include "AdcException.hpp"
+#include "ContinuousReadStrategy.hpp"
+#include "OneShotReadStrategy.hpp"
+
+#include "esp_adc/adc_cali_scheme.h"
+#include "esp_assert.h"
+
+namespace kopter {
+
+#define ATTENUATION ADC_ATTEN_DB_12
+#define BITWIDTH ADC_BITWIDTH_12
+
+static constexpr uint16_t SAMPLE_FREQUENCY = 20000;
+static constexpr uint16_t MAX_STORE_BUF_SIZE = 1024;
+static constexpr uint8_t CONV_FRAME_SIZE = 32;
+static constexpr std::string_view TAG = "[AdcDeviceHolder]";
+
+AdcDeviceHolder::AdcDeviceHolder()
+{
+    configure_continuous_driver();
+    configure_one_shot_driver();
+    configure_calibration();
+}
+
+AdcDeviceHolder::~AdcDeviceHolder()
+{
+    if (m_continuous_handler) {
+        stop_polling();
+        ADC_CHECK_THROW(adc_continuous_deinit(m_continuous_handler));
+    }
+    if (m_one_shot_handler) {
+        ADC_CHECK_THROW(adc_oneshot_del_unit(m_one_shot_handler));
+    }
+    if (m_cali_handler) {
+        ADC_CHECK_THROW(adc_cali_delete_scheme_line_fitting(m_cali_handler));
+    }
+}
+
+AdcDeviceHolder &AdcDeviceHolder::get_instance()
+{
+    static AdcDeviceHolder instance;
+    return instance;
+}
+
+Device *AdcDeviceHolder::add_device(const std::string &name,
+                                    AdcMode mode,
+                                    const std::unordered_set<adc_channel_t> &channels)
+{
+    assert(m_continuous_handler);
+
+    if (m_devices.find(name) != m_devices.end()) {
+        return m_devices[name].get();
+    }
+
+    std::unique_ptr<IAdcReadStrategy> strategy;
+    if (mode == AdcMode::CONTINUOUS) {
+        add_device_continuous(channels);
+        strategy = std::make_unique<ContinuousReadStrategy>(m_continuous_handler, m_cali_handler, CONV_FRAME_SIZE);
+        start_polling();
+    }
+    else {
+        add_device_one_shot(channels);
+        // strategy = std::make_unique<One
+    }
+
+    m_devices[name] = std::make_unique<AdcDevice>(std::move(name), std::move(strategy));
+    return m_devices[name].get();
+}
+
+void AdcDeviceHolder::start_polling()
+{
+    try {
+        ADC_CHECK_THROW(adc_continuous_start(m_continuous_handler));
+    }
+    catch (const AdcException &e) {
+    }
+}
+
+void AdcDeviceHolder::stop_polling()
+{
+    ADC_CHECK_THROW(adc_continuous_stop(m_continuous_handler));
+}
+
+void AdcDeviceHolder::configure_continuous_driver()
+{
+    if (m_continuous_handler) {
+        return;
+    }
+
+    adc_continuous_handle_cfg_t adc_cfg{};
+    adc_cfg.max_store_buf_size = MAX_STORE_BUF_SIZE;
+    adc_cfg.conv_frame_size = CONV_FRAME_SIZE;
+    ADC_CHECK_THROW(adc_continuous_new_handle(&adc_cfg, &m_continuous_handler));
+}
+
+void AdcDeviceHolder::configure_one_shot_driver()
+{
+    adc_oneshot_unit_init_cfg_t adc_one_shot_cfg{};
+    adc_one_shot_cfg.unit_id = ADC_UNIT_1;
+    adc_one_shot_cfg.ulp_mode = ADC_ULP_MODE_DISABLE;
+
+    ADC_CHECK_THROW(adc_oneshot_new_unit(&adc_one_shot_cfg, &m_one_shot_handler));
+}
+
+void AdcDeviceHolder::configure_calibration()
+{
+    auto line_fitting_scheme = ADC_CALI_SCHEME_VER_LINE_FITTING;
+    if (adc_cali_check_scheme(&line_fitting_scheme) != ESP_OK) {
+        return;
+    }
+
+    ESP_LOGI(TAG.data(), "Calibration scheme version is ADC_CALI_SCHEME_VER_LINE_FITTING");
+
+    adc_cali_line_fitting_config_t cali_config{};
+    cali_config.unit_id = ADC_UNIT_1;
+    cali_config.atten = ATTENUATION;
+    cali_config.bitwidth = BITWIDTH;
+
+    try {
+        ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
+    }
+    catch (const AdcException &e) {
+        m_cali_handler = nullptr;
+    }
+}
+
+void AdcDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel_t> &channels)
+{
+    adc_continuous_config_t dig_cfg{};
+    dig_cfg.pattern_num = channels.size();
+    dig_cfg.sample_freq_hz = SAMPLE_FREQUENCY;
+    dig_cfg.conv_mode = ADC_CONV_SINGLE_UNIT_1;
+    dig_cfg.format = ADC_DIGI_OUTPUT_FORMAT_TYPE1;
+
+    std::vector<adc_digi_pattern_config_t> digi_pattern_cfgs;
+    digi_pattern_cfgs.reserve(channels.size());
+    for (const auto &chnl : channels) {
+        adc_digi_pattern_config_t cfg{};
+        cfg.atten = ATTENUATION;
+        cfg.channel = static_cast<uint8_t>(chnl);
+        cfg.unit = ADC_UNIT_1;
+        cfg.bit_width = BITWIDTH;
+
+        digi_pattern_cfgs.emplace_back(cfg);
+    }
+
+    dig_cfg.adc_pattern = digi_pattern_cfgs.data();
+
+    try {
+        ADC_CHECK_THROW(adc_continuous_config(m_continuous_handler, &dig_cfg));
+    }
+    catch (const AdcException &e) {
+    }
+}
+
+void AdcDeviceHolder::add_device_one_shot(const std::unordered_set<adc_channel_t> &channels)
+{
+    adc_oneshot_chan_cfg_t cfg{};
+    cfg.atten = ATTENUATION;
+    cfg.bitwidth = BITWIDTH;
+
+    for (const auto &chnl : channels) {
+        ADC_CHECK_THROW(adc_oneshot_config_channel(m_one_shot_handler, chnl, &cfg));
+    }
+}
+
+} // namespace kopter

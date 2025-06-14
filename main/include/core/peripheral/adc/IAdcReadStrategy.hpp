@@ -14,23 +14,20 @@
  limitations under the License.
  */
 
-#ifndef PCH_HPP
-#define PCH_HPP
+#pragma once
 
-#include "KopterException.hpp"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_continuous.h"
+#include "esp_adc/adc_oneshot.h"
 
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
+namespace kopter {
 
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <unordered_set>
-#include <vector>
+using reading_callback = std::function<void(int16_t voltage, adc_channel_t channel)>;
 
-#endif
+struct IAdcReadStrategy {
+    virtual ~IAdcReadStrategy() = default;
+
+    virtual void read(reading_callback cb) = 0;
+};
+
+} // namespace kopter

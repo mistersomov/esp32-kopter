@@ -14,23 +14,9 @@
  limitations under the License.
  */
 
-#ifndef PCH_HPP
-#define PCH_HPP
+#include "pch.hpp"
+#include "OneShotReadStrategy.hpp"
 
-#include "KopterException.hpp"
+namespace kopter {
 
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <thread>
-#include <unordered_set>
-#include <vector>
-
-#endif
+}
