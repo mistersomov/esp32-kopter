@@ -17,7 +17,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include "DeviceID.hpp"
+#include "peripheral/DeviceID.hpp"
 
 namespace kopter {
 
