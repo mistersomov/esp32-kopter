@@ -28,6 +28,10 @@ namespace kopter {
 class Message;
 class Task;
 
+struct MessageException : public KopterException {
+    MessageException(esp_err_t error);
+};
+
 class MessageManager {
 public:
     using recv_callback = std::function<void(const Message &msg)>;

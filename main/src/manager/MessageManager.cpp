@@ -20,6 +20,10 @@
 #include "Message.hpp"
 #include "Task.hpp"
 
+namespace kopter {
+
+#define MSG_CHECK_THROW(err) CHECK_THROW_WITH(err, MessageException)
+
 #define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP
 #define ESPNOW_WIFI_IF WIFI_IF_AP
@@ -35,11 +39,13 @@ static uint8_t dest_mac[ESP_NOW_ETH_ALEN] = {0xc8, 0xf0, 0x9e, 0xb2, 0x36, 0xfd}
 #endif
 // Customize region end
 
-namespace kopter {
-
 static constexpr uint8_t MESSAGE_QUEUE_SIZE = 6;
 static constexpr std::string_view RECV_MESSAGE_TASK_NAME = "msg_task";
 static constexpr std::string_view TAG = "[MessageManager]";
+
+MessageException::MessageException(esp_err_t error) : KopterException(error)
+{
+}
 
 MessageManager::MessageManager()
 {
@@ -51,10 +57,10 @@ MessageManager::MessageManager()
 
     m_callback_instance = this;
 
-    CHECK_THROW(esp_now_init());
-    CHECK_THROW(esp_now_register_send_cb(esp_now_send_cb));
-    CHECK_THROW(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
-    CHECK_THROW(add_peer_to_list());
+    MSG_CHECK_THROW(esp_now_init());
+    MSG_CHECK_THROW(esp_now_register_send_cb(esp_now_send_cb));
+    MSG_CHECK_THROW(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
+    MSG_CHECK_THROW(add_peer_to_list());
     create_msg_receive_task();
 }
 
@@ -68,7 +74,7 @@ MessageManager::~MessageManager()
         vQueueDelete(m_msg_queue);
         m_msg_queue = nullptr;
     }
-    CHECK_THROW(esp_now_deinit());
+    MSG_CHECK_THROW(esp_now_deinit());
 }
 
 MessageManager &MessageManager::get_instance()
@@ -151,4 +157,5 @@ void MessageManager::create_msg_receive_task()
         }
     });
 }
+
 } // namespace kopter
