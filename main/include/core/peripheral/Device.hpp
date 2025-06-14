@@ -14,27 +14,28 @@
  limitations under the License.
  */
 
-#include "pch.hpp"
-#include "peripheral/PeripheralDevice.hpp"
+#ifndef DEVICE_HPP
+#define DEVICE_HPP
 
 namespace kopter {
 
-static constexpr uint32_t TIMEOUT = 0;
+class Device {
+public:
+    explicit Device(const std::string &name) noexcept : m_tag{"[" + name + "]"}, m_name{std::move(name)}
+    {
+    }
+    virtual ~Device() = default;
 
-static constexpr std::string_view TAG = "[PeripheralDevice]";
+    const std::string &get_tag() const noexcept
+    {
+        return m_tag;
+    }
 
-PeripheralDevice::PeripheralDevice(const size_t &frame_size, adc_continuous_handle_t shared_handler)
-    : m_handler(shared_handler), m_frame_size(frame_size)
-{
-}
-
-PeripheralDevice::~PeripheralDevice()
-{
-}
-
-esp_err_t PeripheralDevice::read_value(uint8_t *buf, uint32_t *out_length)
-{
-    return adc_continuous_read(m_handler, buf, m_frame_size, out_length, TIMEOUT);
-}
+private:
+    std::string m_tag;
+    std::string m_name;
+};
 
 } // namespace kopter
+
+#endif

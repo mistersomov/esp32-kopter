@@ -15,8 +15,8 @@
  */
 
 #include "pch.hpp"
+#include "MessageManager.hpp"
 
-#include "manager/MessageManager.hpp"
 #include "Message.hpp"
 #include "Task.hpp"
 

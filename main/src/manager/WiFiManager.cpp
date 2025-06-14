@@ -15,10 +15,10 @@
  */
 
 #include "pch.hpp"
+#include "WiFiManager.hpp"
 
 #include "event/WiFiEvents.hpp"
-#include "manager/LoopManager.hpp"
-#include "manager/WiFiManager.hpp"
+#include "LoopManager.hpp"
 #include "Message.hpp"
 
 #include "nvs.h"

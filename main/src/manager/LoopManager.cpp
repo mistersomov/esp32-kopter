@@ -15,7 +15,7 @@
  */
 
 #include "pch.hpp"
-#include "manager/LoopManager.hpp"
+#include "LoopManager.hpp"
 
 #include "esp_event_api.hpp"
 #include "esp_event_cxx.hpp"
@@ -32,13 +32,14 @@ namespace kopter {
 
 static esp_event_loop_args_t make_loop_args()
 {
-    return esp_event_loop_args_t{
-        .queue_size = QUEUE_SIZE,
-        .task_name = TASK_NAME.data(),
-        .task_priority = TASK_PRIORITY,
-        .task_stack_size = TASK_STACK_SIZE,
-        .task_core_id = CORE_ID
-    };
+    esp_event_loop_args_t args;
+    args.queue_size = QUEUE_SIZE;
+    args.task_name = TASK_NAME.data();
+    args.task_priority = TASK_PRIORITY;
+    args.task_stack_size = TASK_STACK_SIZE;
+    args.task_core_id = CORE_ID;
+
+    return args;
 }
 
 LoopManager::LoopManager()
@@ -47,9 +48,8 @@ LoopManager::LoopManager()
 {
 }
 
-std::unique_ptr<ESPEventReg> LoopManager::register_system_event(
-    const ESPEvent &event, std::function<void(const ESPEvent &, void *)> cb
-)
+std::unique_ptr<ESPEventReg> LoopManager::register_system_event(const ESPEvent &event,
+                                                                std::function<void(const ESPEvent &, void *)> cb)
 {
     std::unique_ptr<ESPEventReg> system_event = m_default_loop->register_event(event, cb);
     return system_event;
