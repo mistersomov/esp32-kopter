@@ -19,7 +19,20 @@
 #include "IAdcReadStrategy.hpp"
 
 namespace kopter {
-// TODO Implement OneShot Strategy
-// class OneShotReadStrategy : public IAdcReadStrategy {};
+
+class OneShotReadStrategy : public IAdcReadStrategy {
+public:
+    OneShotReadStrategy(adc_oneshot_unit_handle_t shared_handler,
+                        adc_cali_handle_t shared_cali_handler,
+                        const std::unordered_set<adc_channel_t> &channels);
+    ~OneShotReadStrategy() override = default;
+
+    void read(reading_callback cb) override;
+
+private:
+    adc_oneshot_unit_handle_t m_one_shot_handler{nullptr};
+    adc_cali_handle_t m_cali_handler{nullptr};
+    std::unordered_set<adc_channel_t> m_channels;
+};
 
 } // namespace kopter

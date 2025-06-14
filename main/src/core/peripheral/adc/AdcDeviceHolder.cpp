@@ -79,7 +79,7 @@ Device *AdcDeviceHolder::add_device(const std::string &name,
     }
     else {
         add_device_one_shot(channels);
-        // strategy = std::make_unique<One
+        strategy = std::make_unique<OneShotReadStrategy>(m_one_shot_handler, m_cali_handler, channels);
     }
 
     m_devices[name] = std::make_unique<AdcDevice>(std::move(name), std::move(strategy));

@@ -17,6 +17,30 @@
 #include "pch.hpp"
 #include "OneShotReadStrategy.hpp"
 
+#include "AdcException.hpp"
+
 namespace kopter {
 
+OneShotReadStrategy::OneShotReadStrategy(adc_oneshot_unit_handle_t shared_handler,
+                                         adc_cali_handle_t shared_cali_handler,
+                                         const std::unordered_set<adc_channel_t> &channels)
+    : m_one_shot_handler{shared_handler}, m_cali_handler{shared_cali_handler}, m_channels{channels}
+{
 }
+
+void OneShotReadStrategy::read(reading_callback cb)
+{
+    auto raw_value = 0;
+    for (const auto &chnl : m_channels) {
+        ADC_CHECK_THROW(adc_oneshot_read(m_one_shot_handler, chnl, &raw_value));
+
+        if (m_cali_handler) {
+            auto voltage = 0;
+
+            adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage);
+            cb(voltage, chnl);
+        }
+    }
+}
+
+} // namespace kopter

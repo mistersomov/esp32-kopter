@@ -37,17 +37,23 @@ void ContinuousReadStrategy::read(reading_callback cb)
 
     ADC_CHECK_THROW(adc_continuous_read(m_continuous_handler, buf.data(), m_frame_size, &out_length, TIMEOUT));
 
-    if (m_cali_handler && out_length > 0) {
+    if (out_length > 0) {
         size_t sample_count = out_length / sizeof(adc_digi_output_data_t);
         const auto *samples = reinterpret_cast<adc_digi_output_data_t *>(buf.data());
 
         for (auto i = 0; i != sample_count; ++i) {
             const auto channel = static_cast<adc_channel_t>(samples[i].type1.channel);
             const auto raw_value = samples[i].type1.data;
-            auto voltage = 0;
 
-            adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage);
-            cb(voltage, channel);
+            if (m_cali_handler) {
+                auto voltage = 0;
+
+                adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage);
+                cb(voltage, channel);
+            }
+            else {
+                cb(raw_value, channel);
+            }
         }
     }
 }
