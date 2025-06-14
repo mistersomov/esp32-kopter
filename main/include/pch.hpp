@@ -17,7 +17,8 @@
 #ifndef PCH_HPP
 #define PCH_HPP
 
-#include "esp_exception.hpp"
+#include "exception/Exception.hpp"
+
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 

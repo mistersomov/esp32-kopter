@@ -4,8 +4,8 @@ if (NOT target)
     message(WARNING "IDF_TARGET not set, defaulting to esp32")
 endif()
 
-set(srcdirs "src" "src/core/peripheral" "src/core/peripheral/adc" "src/manager" "src/motor")
-set(includedirs "include" "include/core" "include/core/peripheral" "include/core/peripheral/adc" "include/manager")
+set(srcdirs "src" "src/manager" "src/motor")
+set(includedirs "include" "include/core" "include/core/exception" "include/core/peripheral" "include/manager")
 
 idf_component_register(
     SRC_DIRS ${srcdirs}
