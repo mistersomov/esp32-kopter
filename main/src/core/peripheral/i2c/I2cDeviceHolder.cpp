@@ -1,0 +1,57 @@
+/*
+ Copyright 2025 Ivan Somov
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+#include "pch.hpp"
+#include "I2cDeviceHolder.hpp"
+#include "I2cException.hpp"
+
+using namespace idf;
+
+namespace kopter {
+
+static constexpr uint8_t SDA = 21;
+static constexpr uint8_t SCL = 22;
+static constexpr uint32_t FREQUENCY = 400000;
+
+I2cDeviceHolder::I2cDeviceHolder()
+    : m_master{std::make_unique<I2CMaster>(I2CNumber::I2C0(), SCL_GPIO(SCL), SDA_GPIO(SDA), Frequency(FREQUENCY))}
+{
+}
+
+I2cDeviceHolder &I2cDeviceHolder::get_instance()
+{
+    static I2cDeviceHolder instance;
+    return instance;
+}
+
+Device *I2cDeviceHolder::add_device(const std::string &name, const uint8_t &address)
+{
+    assert(m_master);
+
+    if (m_devices.find(name) != m_devices.end()) {
+        return m_devices[name].get();
+    }
+
+    try {
+        m_devices[name] = std::make_unique<I2cDevice>(std::move(name), I2CAddress(std::move(address)), m_master.get());
+        return m_devices[name].get();
+    }
+    catch (const I2CException &e) {
+        throw I2cException(e.error);
+    }
+}
+
+} // namespace kopter
