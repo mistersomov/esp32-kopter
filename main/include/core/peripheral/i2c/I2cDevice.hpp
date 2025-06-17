@@ -24,6 +24,7 @@ namespace kopter {
 class I2cDevice : public Device {
 public:
     I2cDevice(const std::string &name, const idf::I2CAddress &address, idf::I2CMaster *shared_master);
+    virtual ~I2cDevice() override = default;
 
 protected:
     const idf::I2CAddress &get_address() const noexcept;

@@ -22,7 +22,7 @@ using namespace idf;
 namespace kopter {
 
 I2cDevice::I2cDevice(const std::string &name, const idf::I2CAddress &address, I2CMaster *shared_master)
-    : Device(std::move(name)), m_address{std::move(address)}, m_master{shared_master}
+    : Device(std::move(name)), m_address{address}, m_master{shared_master}
 {
 }
 
