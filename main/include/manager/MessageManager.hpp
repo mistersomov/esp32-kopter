@@ -14,10 +14,7 @@
  limitations under the License.
  */
 
-#ifndef MESSAGE_MANAGER_HPP
-#define MESSAGE_MANAGER_HPP
-
-#include "peripheral/DeviceID.hpp"
+#pragma once
 
 #include "esp_now.h"
 
@@ -42,7 +39,7 @@ public:
 
     static MessageManager &get_instance();
 
-    void register_callback(DeviceID id, recv_callback cb);
+    void register_callback(const std::string &device_tag, recv_callback cb);
     void send_message(const Message &msg) const;
 
 private:
@@ -55,7 +52,7 @@ private:
     esp_err_t add_peer_to_list() const;
     void create_msg_receive_task();
 
-    std::unordered_map<DeviceID, recv_callback> m_recv_callbacks;
+    std::unordered_map<std::string, recv_callback> m_recv_callbacks;
     Task *m_recv_task{nullptr};
     QueueHandle_t m_msg_queue{nullptr};
     // Static pointer for callback
@@ -63,5 +60,3 @@ private:
 };
 
 } // namespace kopter
-
-#endif

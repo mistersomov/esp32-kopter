@@ -83,10 +83,10 @@ MessageManager &MessageManager::get_instance()
     return instance;
 }
 
-void MessageManager::register_callback(DeviceID id, recv_callback cb)
+void MessageManager::register_callback(const std::string &device_tag, recv_callback cb)
 {
-    if (m_recv_callbacks.find(id) == m_recv_callbacks.end()) {
-        m_recv_callbacks[id] = std::move(cb);
+    if (m_recv_callbacks.find(device_tag) == m_recv_callbacks.end()) {
+        m_recv_callbacks[device_tag] = std::move(cb);
     }
 }
 
@@ -148,7 +148,7 @@ void MessageManager::create_msg_receive_task()
 
         while (true) {
             if (xQueueReceive(m_msg_queue, &msg, portMAX_DELAY)) {
-                auto itt = m_recv_callbacks.find(msg->device_id);
+                auto itt = m_recv_callbacks.find(msg->device_tag);
                 if (itt != m_recv_callbacks.end()) {
                     itt->second(*msg);
                 }
