@@ -17,10 +17,10 @@
 #include "pch.hpp"
 #include "WiFiManager.hpp"
 
-#include "event/WiFiEvents.hpp"
 #include "LoopManager.hpp"
 #include "Message.hpp"
 
+#include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
 
