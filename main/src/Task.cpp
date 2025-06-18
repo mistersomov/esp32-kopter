@@ -14,23 +14,24 @@
  limitations under the License.
  */
 
-#pragma once
+#include "pch.hpp"
+#include "Task.hpp"
 
 namespace kopter {
 
-class Task {
-public:
-    using TaskFn = std::function<void()>;
+Task::Task(const char *task_name, TaskFn fn, uint32_t stack_size, UBaseType_t priority, BaseType_t coreId)
+    : m_fn(std::move(fn))
+{
+    xTaskCreatePinnedToCore(Task::task_trampoline, task_name, stack_size, this, priority, nullptr, coreId);
+}
 
-    Task(const char *task_name,
-         TaskFn fn,
-         uint32_t stack_size = 2048,
-         UBaseType_t priority = 5,
-         BaseType_t coreId = tskNO_AFFINITY);
+void Task::task_trampoline(void *param)
+{
+    auto *self = static_cast<Task *>(param);
+    assert(self);
 
-private:
-    static void task_trampoline(void *param);
-    TaskFn m_fn;
-};
+    self->m_fn();
+    vTaskDelete(nullptr);
+}
 
 } // namespace kopter
