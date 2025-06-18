@@ -14,25 +14,22 @@
  limitations under the License.
  */
 
-#ifndef ADC_DEVICE_HPP
-#define ADC_DEVICE_HPP
+#pragma once
 
 #include "Device.hpp"
-#include "IAdcReadStrategy.hpp"
+#include "IADCReadStrategy.hpp"
 
 namespace kopter {
 
-class AdcDevice : public Device {
+class ADCDevice : public Device {
 public:
-    AdcDevice(const std::string &name, std::unique_ptr<IAdcReadStrategy> strategy);
-    virtual ~AdcDevice();
+    ADCDevice(const std::string &name, std::unique_ptr<IADCReadStrategy> strategy);
+    virtual ~ADCDevice();
 
     void read(reading_callback cb);
 
 private:
-    std::unique_ptr<IAdcReadStrategy> m_read_strategy{nullptr};
+    std::unique_ptr<IADCReadStrategy> m_read_strategy{nullptr};
 };
 
 } // namespace kopter
-
-#endif

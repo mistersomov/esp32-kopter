@@ -15,25 +15,25 @@
  */
 
 #include "pch.hpp"
-#include "AdcDevice.hpp"
-#include "AdcException.hpp"
+#include "ADCDevice.hpp"
+#include "ADCException.hpp"
 
 namespace kopter {
 
-AdcDevice::AdcDevice(const std::string &name, std::unique_ptr<IAdcReadStrategy> strategy)
+ADCDevice::ADCDevice(const std::string &name, std::unique_ptr<IADCReadStrategy> strategy)
     : Device{name}, m_read_strategy{std::move(strategy)}
 {
 }
 
-AdcDevice::~AdcDevice()
+ADCDevice::~ADCDevice()
 {
 }
 
-void AdcDevice::read(reading_callback cb)
+void ADCDevice::read(reading_callback cb)
 {
     if (!m_read_strategy) {
         ESP_LOGE(get_tag().c_str(), "Read strategy not set.");
-        throw AdcException(ESP_ERR_INVALID_STATE);
+        throw ADCException(ESP_ERR_INVALID_STATE);
     }
     m_read_strategy->read(cb);
 }

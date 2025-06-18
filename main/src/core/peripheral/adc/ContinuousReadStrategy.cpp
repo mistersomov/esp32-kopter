@@ -17,7 +17,7 @@
 #include "pch.hpp"
 #include "ContinuousReadStrategy.hpp"
 
-#include "AdcException.hpp"
+#include "ADCException.hpp"
 
 namespace kopter {
 

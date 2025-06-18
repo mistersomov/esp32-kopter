@@ -15,9 +15,9 @@
  */
 
 #include "pch.hpp"
-#include "AdcDeviceHolder.hpp"
+#include "ADCDeviceHolder.hpp"
 
-#include "AdcException.hpp"
+#include "ADCException.hpp"
 #include "ContinuousReadStrategy.hpp"
 #include "OneShotReadStrategy.hpp"
 
@@ -32,16 +32,16 @@ namespace kopter {
 static constexpr uint16_t SAMPLE_FREQUENCY = 20000;
 static constexpr uint16_t MAX_STORE_BUF_SIZE = 1024;
 static constexpr uint8_t CONV_FRAME_SIZE = 32;
-static constexpr std::string_view TAG = "[AdcDeviceHolder]";
+static constexpr std::string_view TAG = "[ADCDeviceHolder]";
 
-AdcDeviceHolder::AdcDeviceHolder()
+ADCDeviceHolder::ADCDeviceHolder()
 {
     configure_continuous_driver();
     configure_one_shot_driver();
     configure_calibration();
 }
 
-AdcDeviceHolder::~AdcDeviceHolder()
+ADCDeviceHolder::~ADCDeviceHolder()
 {
     if (m_continuous_handler) {
         stop_polling();
@@ -55,14 +55,14 @@ AdcDeviceHolder::~AdcDeviceHolder()
     }
 }
 
-AdcDeviceHolder &AdcDeviceHolder::get_instance()
+ADCDeviceHolder &ADCDeviceHolder::get_instance()
 {
-    static AdcDeviceHolder instance;
+    static ADCDeviceHolder instance;
     return instance;
 }
 
-Device *AdcDeviceHolder::add_device(const std::string &name,
-                                    AdcMode mode,
+Device *ADCDeviceHolder::add_device(const std::string &name,
+                                    ADCMode mode,
                                     const std::unordered_set<adc_channel_t> &channels)
 {
     assert(m_continuous_handler);
@@ -71,8 +71,8 @@ Device *AdcDeviceHolder::add_device(const std::string &name,
         return m_devices[name].get();
     }
 
-    std::unique_ptr<IAdcReadStrategy> strategy;
-    if (mode == AdcMode::CONTINUOUS) {
+    std::unique_ptr<IADCReadStrategy> strategy;
+    if (mode == ADCMode::CONTINUOUS) {
         add_device_continuous(channels);
         strategy = std::make_unique<ContinuousReadStrategy>(m_continuous_handler, m_cali_handler, CONV_FRAME_SIZE);
         start_polling();
@@ -82,25 +82,25 @@ Device *AdcDeviceHolder::add_device(const std::string &name,
         strategy = std::make_unique<OneShotReadStrategy>(m_one_shot_handler, m_cali_handler, channels);
     }
 
-    m_devices[name] = std::make_unique<AdcDevice>(std::move(name), std::move(strategy));
+    m_devices[name] = std::make_unique<ADCDevice>(std::move(name), std::move(strategy));
     return m_devices[name].get();
 }
 
-void AdcDeviceHolder::start_polling()
+void ADCDeviceHolder::start_polling()
 {
     try {
         ADC_CHECK_THROW(adc_continuous_start(m_continuous_handler));
     }
-    catch (const AdcException &e) {
+    catch (const ADCException &e) {
     }
 }
 
-void AdcDeviceHolder::stop_polling()
+void ADCDeviceHolder::stop_polling()
 {
     ADC_CHECK_THROW(adc_continuous_stop(m_continuous_handler));
 }
 
-void AdcDeviceHolder::configure_continuous_driver()
+void ADCDeviceHolder::configure_continuous_driver()
 {
     if (m_continuous_handler) {
         return;
@@ -112,7 +112,7 @@ void AdcDeviceHolder::configure_continuous_driver()
     ADC_CHECK_THROW(adc_continuous_new_handle(&adc_cfg, &m_continuous_handler));
 }
 
-void AdcDeviceHolder::configure_one_shot_driver()
+void ADCDeviceHolder::configure_one_shot_driver()
 {
     adc_oneshot_unit_init_cfg_t adc_one_shot_cfg{};
     adc_one_shot_cfg.unit_id = ADC_UNIT_1;
@@ -121,7 +121,7 @@ void AdcDeviceHolder::configure_one_shot_driver()
     ADC_CHECK_THROW(adc_oneshot_new_unit(&adc_one_shot_cfg, &m_one_shot_handler));
 }
 
-void AdcDeviceHolder::configure_calibration()
+void ADCDeviceHolder::configure_calibration()
 {
     auto line_fitting_scheme = ADC_CALI_SCHEME_VER_LINE_FITTING;
     if (adc_cali_check_scheme(&line_fitting_scheme) != ESP_OK) {
@@ -138,12 +138,12 @@ void AdcDeviceHolder::configure_calibration()
     try {
         ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
     }
-    catch (const AdcException &e) {
+    catch (const ADCException &e) {
         m_cali_handler = nullptr;
     }
 }
 
-void AdcDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel_t> &channels)
+void ADCDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel_t> &channels)
 {
     adc_continuous_config_t dig_cfg{};
     dig_cfg.pattern_num = channels.size();
@@ -168,11 +168,11 @@ void AdcDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel
     try {
         ADC_CHECK_THROW(adc_continuous_config(m_continuous_handler, &dig_cfg));
     }
-    catch (const AdcException &e) {
+    catch (const ADCException &e) {
     }
 }
 
-void AdcDeviceHolder::add_device_one_shot(const std::unordered_set<adc_channel_t> &channels)
+void ADCDeviceHolder::add_device_one_shot(const std::unordered_set<adc_channel_t> &channels)
 {
     adc_oneshot_chan_cfg_t cfg{};
     cfg.atten = ATTENUATION;

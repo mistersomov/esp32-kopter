@@ -15,11 +15,11 @@
  */
 
 #include "pch.hpp"
-#include "AdcException.hpp"
+#include "ADCException.hpp"
 
 namespace kopter {
 
-AdcException::AdcException(esp_err_t error) : KopterException(error)
+ADCException::ADCException(esp_err_t error) : KopterException(error)
 {
 }
 

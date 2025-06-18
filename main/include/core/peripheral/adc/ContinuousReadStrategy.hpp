@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include "IAdcReadStrategy.hpp"
+#include "IADCReadStrategy.hpp"
 
 namespace kopter {
 
-class ContinuousReadStrategy : public IAdcReadStrategy {
+class ContinuousReadStrategy : public IADCReadStrategy {
 public:
     ContinuousReadStrategy(adc_continuous_handle_t shared_handler,
                            adc_cali_handle_t shared_cali_handler,

@@ -15,4 +15,4 @@
  */
 
 #include "pch.hpp"
-#include "IAdcReadStrategy.hpp"
+#include "IADCReadStrategy.hpp"

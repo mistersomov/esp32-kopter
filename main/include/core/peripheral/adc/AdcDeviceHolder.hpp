@@ -14,25 +14,24 @@
  limitations under the License.
  */
 
-#ifndef ADC_DEVICE_HOLDER_HPP
-#define ADC_DEVICE_HOLDER_HPP
+#pragma once
 
-#include "AdcDevice.hpp"
-#include "AdcMode.hpp"
+#include "ADCDevice.hpp"
+#include "ADCMode.hpp"
 
 namespace kopter {
 
-class AdcDeviceHolder {
+class ADCDeviceHolder {
 public:
-    AdcDeviceHolder(const AdcDeviceHolder &) = delete;
-    AdcDeviceHolder &operator=(const AdcDeviceHolder &) = delete;
-    ~AdcDeviceHolder();
+    ADCDeviceHolder(const ADCDeviceHolder &) = delete;
+    ADCDeviceHolder &operator=(const ADCDeviceHolder &) = delete;
+    ~ADCDeviceHolder();
 
-    static AdcDeviceHolder &get_instance();
-    Device *add_device(const std::string &name, AdcMode mode, const std::unordered_set<adc_channel_t> &channels);
+    static ADCDeviceHolder &get_instance();
+    Device *add_device(const std::string &name, ADCMode mode, const std::unordered_set<adc_channel_t> &channels);
 
 private:
-    AdcDeviceHolder();
+    ADCDeviceHolder();
 
     void configure_continuous_driver();
     void configure_one_shot_driver();
@@ -49,5 +48,3 @@ private:
 };
 
 } // namespace kopter
-
-#endif

@@ -18,10 +18,10 @@
 
 namespace kopter {
 
-#define ADC_CHECK_THROW(err) CHECK_THROW_WITH(err, AdcException)
+#define ADC_CHECK_THROW(err) CHECK_THROW_WITH(err, ADCException)
 
-struct AdcException : public KopterException {
-    AdcException(esp_err_t error);
+struct ADCException : public KopterException {
+    ADCException(esp_err_t error);
 };
 
 } // namespace kopter

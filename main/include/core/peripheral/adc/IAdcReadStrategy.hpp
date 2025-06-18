@@ -24,8 +24,8 @@ namespace kopter {
 
 using reading_callback = std::function<void(int16_t voltage, adc_channel_t channel)>;
 
-struct IAdcReadStrategy {
-    virtual ~IAdcReadStrategy() = default;
+struct IADCReadStrategy {
+    virtual ~IADCReadStrategy() = default;
 
     virtual void read(reading_callback cb) = 0;
 };

@@ -14,14 +14,11 @@
  limitations under the License.
  */
 
-#ifndef ADC_MODE_HPP
-#define ADC_MODE_HPP
+#pragma once
 
 namespace kopter {
-enum class AdcMode : char {
+enum class ADCMode : char {
     ONE_SHOT,
     CONTINUOUS
 };
 } // namespace kopter
-
-#endif
