@@ -46,6 +46,8 @@ float MPU6050::read_ax() const
     auto raw = get_raw_value(AX_UPPER_BYTE);
     float ax = m_mapper->map_accel_x(raw);
 
+    ESP_LOGI(m_i2c_device->get_tag().c_str(), "AX: %.3f", ax); // TODO delete log
+
     return ax;
 }
 
@@ -61,6 +63,8 @@ float MPU6050::read_az() const
 {
     auto raw = get_raw_value(AZ_UPPER_BYTE);
     float az = m_mapper->map_accel_z(raw);
+
+    ESP_LOGI(m_i2c_device->get_tag().c_str(), "AZ: %.3f", az); // TODO delete log
 
     return az;
 }
