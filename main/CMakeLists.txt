@@ -4,8 +4,25 @@ if (NOT target)
     message(WARNING "IDF_TARGET not set, defaulting to esp32")
 endif()
 
-set(srcdirs "src" "src/core/peripheral/adc" "src/core/peripheral/i2c" "src/manager")
-set(includedirs "include" "include/core" "include/core/exception" "include/core/peripheral" "include/core/peripheral/adc" "include/core/peripheral/i2c" "include/manager")
+set(srcdirs 
+        "src"
+        "src/core/peripheral/adc"
+        "src/core/peripheral/i2c"
+        "src/imu"
+        "src/imu/mpu6050"
+        "src/manager"
+)
+set(includedirs 
+        "include"
+        "include/core"
+        "include/core/exception"
+        "include/core/peripheral"
+        "include/core/peripheral/adc"
+        "include/core/peripheral/i2c"
+        "include/imu"
+        "include/imu/mpu6050"
+        "include/manager"
+)
 
 idf_component_register(
     SRC_DIRS ${srcdirs}
