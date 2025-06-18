@@ -26,7 +26,7 @@ namespace kopter {
  *
  * The higher the G-force range, the less sensitive the readings (but more tolerant to higher accelerations).
  */
-enum class AccelSensivityMode {
+enum class AccelSensitivityMode {
     TWO_G,
     FOUR_G,
     EIGHT_G,
@@ -38,13 +38,12 @@ enum class AccelSensivityMode {
  * @brief Represents gyroscope sensitivity settings for the MPU6050.
  *
  * Typically maps to angular velocity ranges like ±250, ±500, ±1000, and ±2000 degrees/second.
- * NOTE: Naming as ZERO/ONE/TWO/THREE may be implementation-specific and not self-descriptive.
  */
-enum class GyroSensivityMode {
-    ZERO,
-    ONE,
-    TWO,
-    THREE
+enum class GyroSensitivityMode {
+    DPS_250,
+    DPS_500,
+    DPS_1000,
+    DPS_2000
 };
 
 /**
@@ -67,16 +66,16 @@ public:
      * @param ax_mode Sensitivity for accelerometer X axis (default: TWO_G)
      * @param ay_mode Sensitivity for accelerometer Y axis (default: TWO_G)
      * @param az_mode Sensitivity for accelerometer Z axis (default: TWO_G)
-     * @param gx_mode Sensitivity for gyroscope X axis (default: ZERO = ±250°/s)
-     * @param gy_mode Sensitivity for gyroscope Y axis (default: ZERO = ±250°/s)
-     * @param gz_mode Sensitivity for gyroscope Z axis (default: ZERO = ±250°/s)
+     * @param gx_mode Sensitivity for gyroscope X axis (default: DPS_250 = ±250°/s)
+     * @param gy_mode Sensitivity for gyroscope Y axis (default: DPS_250 = ±250°/s)
+     * @param gz_mode Sensitivity for gyroscope Z axis (default: DPS_250 = ±250°/s)
      */
-    explicit MPU6050Mapper(AccelSensivityMode ax_mode = AccelSensivityMode::TWO_G,
-                           AccelSensivityMode ay_mode = AccelSensivityMode::TWO_G,
-                           AccelSensivityMode az_mode = AccelSensivityMode::TWO_G,
-                           GyroSensivityMode gx_mode = GyroSensivityMode::ZERO,
-                           GyroSensivityMode gy_mode = GyroSensivityMode::ZERO,
-                           GyroSensivityMode gz_mode = GyroSensivityMode::ZERO) noexcept;
+    explicit MPU6050Mapper(AccelSensitivityMode ax_mode = AccelSensitivityMode::TWO_G,
+                           AccelSensitivityMode ay_mode = AccelSensitivityMode::TWO_G,
+                           AccelSensitivityMode az_mode = AccelSensitivityMode::TWO_G,
+                           GyroSensitivityMode gx_mode = GyroSensitivityMode::DPS_250,
+                           GyroSensitivityMode gy_mode = GyroSensitivityMode::DPS_250,
+                           GyroSensitivityMode gz_mode = GyroSensitivityMode::DPS_250) noexcept;
 
     /**
      * @brief Default dtor.
@@ -132,7 +131,7 @@ private:
      * @param mode Sensitivity mode.
      * @return Acceleration in g.
      */
-    float map_accel(int16_t value, AccelSensivityMode mode) const;
+    float map_accel(int16_t value, AccelSensitivityMode mode) const;
 
     /**
      * @brief Internal helper to convert raw gyroscope value using the specified mode.
@@ -140,14 +139,14 @@ private:
      * @param mode Sensitivity mode.
      * @return Angular velocity in °/s.
      */
-    float map_gyro(int16_t value, GyroSensivityMode mode) const;
+    float map_gyro(int16_t value, GyroSensitivityMode mode) const;
 
-    AccelSensivityMode m_ax_mode;
-    AccelSensivityMode m_ay_mode;
-    AccelSensivityMode m_az_mode;
-    GyroSensivityMode m_gx_mode;
-    GyroSensivityMode m_gy_mode;
-    GyroSensivityMode m_gz_mode;
+    AccelSensitivityMode m_ax_mode;
+    AccelSensitivityMode m_ay_mode;
+    AccelSensitivityMode m_az_mode;
+    GyroSensitivityMode m_gx_mode;
+    GyroSensitivityMode m_gy_mode;
+    GyroSensitivityMode m_gz_mode;
 };
 
 } // namespace kopter

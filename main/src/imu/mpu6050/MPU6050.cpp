@@ -46,8 +46,6 @@ float MPU6050::read_ax() const
     auto raw = get_raw_value(AX_UPPER_BYTE);
     float ax = m_mapper->map_accel_x(raw);
 
-    ESP_LOGI(m_i2c_device->get_tag().c_str(), "AX: %.3f", ax);
-
     return ax;
 }
 

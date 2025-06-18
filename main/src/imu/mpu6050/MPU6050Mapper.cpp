@@ -28,12 +28,12 @@ static constexpr float GFS_SEL_1 = 65.5f;
 static constexpr float GFS_SEL_2 = 32.8f;
 static constexpr float GFS_SEL_3 = 16.4f;
 
-MPU6050Mapper::MPU6050Mapper(AccelSensivityMode ax_mode,
-                             AccelSensivityMode ay_mode,
-                             AccelSensivityMode az_mode,
-                             GyroSensivityMode gx_mode,
-                             GyroSensivityMode gy_mode,
-                             GyroSensivityMode gz_mode) noexcept
+MPU6050Mapper::MPU6050Mapper(AccelSensitivityMode ax_mode,
+                             AccelSensitivityMode ay_mode,
+                             AccelSensitivityMode az_mode,
+                             GyroSensitivityMode gx_mode,
+                             GyroSensitivityMode gy_mode,
+                             GyroSensitivityMode gz_mode) noexcept
     : IIMUValueMapper(),
       m_ax_mode{ax_mode},
       m_ay_mode{ay_mode},
@@ -74,32 +74,32 @@ float MPU6050Mapper::map_gyro_z(int16_t raw) const
     return map_gyro(raw, m_gz_mode);
 }
 
-float MPU6050Mapper::map_accel(int16_t value, AccelSensivityMode mode) const
+float MPU6050Mapper::map_accel(int16_t value, AccelSensitivityMode mode) const
 {
     switch (mode) {
-    case AccelSensivityMode::TWO_G:
+    case AccelSensitivityMode::TWO_G:
         return value / AFS_SEL_0;
-    case AccelSensivityMode::FOUR_G:
+    case AccelSensitivityMode::FOUR_G:
         return value / AFS_SEL_1;
-    case AccelSensivityMode::EIGHT_G:
+    case AccelSensitivityMode::EIGHT_G:
         return value / AFS_SEL_2;
-    case AccelSensivityMode::SIXTEEN_G:
+    case AccelSensitivityMode::SIXTEEN_G:
         return value / AFS_SEL_3;
     default:
         return value / AFS_SEL_0;
     }
 }
 
-float MPU6050Mapper::map_gyro(int16_t value, GyroSensivityMode mode) const
+float MPU6050Mapper::map_gyro(int16_t value, GyroSensitivityMode mode) const
 {
     switch (mode) {
-    case GyroSensivityMode::ZERO:
+    case GyroSensitivityMode::DPS_250:
         return value / GFS_SEL_0;
-    case GyroSensivityMode::ONE:
+    case GyroSensitivityMode::DPS_500:
         return value / GFS_SEL_1;
-    case GyroSensivityMode::TWO:
+    case GyroSensitivityMode::DPS_1000:
         return value / GFS_SEL_2;
-    case GyroSensivityMode::THREE:
+    case GyroSensitivityMode::DPS_2000:
         return value / GFS_SEL_3;
     default:
         return value / GFS_SEL_0;
