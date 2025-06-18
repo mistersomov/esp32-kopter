@@ -9,7 +9,6 @@ set(srcdirs
         "src/core/peripheral/adc"
         "src/core/peripheral/i2c"
         "src/imu"
-        "src/imu/mpu6050"
         "src/manager"
 )
 set(includedirs 
@@ -20,7 +19,6 @@ set(includedirs
         "include/core/peripheral/adc"
         "include/core/peripheral/i2c"
         "include/imu"
-        "include/imu/mpu6050"
         "include/manager"
 )
 
