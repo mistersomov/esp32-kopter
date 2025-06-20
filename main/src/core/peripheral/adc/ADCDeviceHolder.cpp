@@ -53,7 +53,7 @@ ADCDeviceHolder::~ADCDeviceHolder()
     if (m_cali_handler) {
 #ifdef ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
         ADC_CHECK_THROW(adc_cali_delete_scheme_curve_fitting(m_cali_handler));
-#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+#elif defined(ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED)
         ADC_CHECK_THROW(adc_cali_delete_scheme_line_fitting(m_cali_handler));
 #endif
     }
@@ -135,7 +135,7 @@ void ADCDeviceHolder::configure_calibration()
             configure_curve_fitting_calibration();
             return;
         }
-#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+#elif defined(ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED)
         adc_cali_scheme_ver_t scheme = ADC_CALI_SCHEME_VER_LINE_FITTING;
         if (adc_cali_check_scheme(&scheme) == ESP_OK) {
             ESP_LOGI(TAG.data(), "ADC calibration is using line fitting scheme");
@@ -152,17 +152,7 @@ void ADCDeviceHolder::configure_calibration()
     }
 }
 
-#ifdef ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
-void ADCDeviceHolder::configure_line_fitting_calibration()
-{
-    adc_cali_line_fitting_config_t cali_config{};
-    cali_config.unit_id = ADC_UNIT_1;
-    cali_config.atten = ATTENUATION;
-    cali_config.bitwidth = BITWIDTH;
-    ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
-}
-
-#elif ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+#ifdef ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
 void ADCDeviceHolder::configure_curve_fitting_calibration()
 {
     adc_cali_curve_fitting_config_t cali_config{};
@@ -170,6 +160,16 @@ void ADCDeviceHolder::configure_curve_fitting_calibration()
     cali_config.atten = ATTENUATION;
     cali_config.bitwidth = BITWIDTH;
     ADC_CHECK_THROW(adc_cali_create_scheme_curve_fitting(&cali_config, &m_cali_handler));
+}
+
+#elif defined(ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED)
+void ADCDeviceHolder::configure_line_fitting_calibration()
+{
+    adc_cali_line_fitting_config_t cali_config{};
+    cali_config.unit_id = ADC_UNIT_1;
+    cali_config.atten = ATTENUATION;
+    cali_config.bitwidth = BITWIDTH;
+    ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
 }
 #endif
 

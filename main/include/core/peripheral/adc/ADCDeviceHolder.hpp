@@ -36,10 +36,10 @@ private:
     void configure_continuous_driver();
     void configure_one_shot_driver();
     void configure_calibration();
-#ifdef ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
-    void configure_line_fitting_calibration();
-#elif ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+#ifdef ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
     void configure_curve_fitting_calibration();
+#elif defined(ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED)
+    void configure_line_fitting_calibration();
 #endif
     void add_device_continuous(const std::unordered_set<adc_channel_t> &channels);
     void add_device_one_shot(const std::unordered_set<adc_channel_t> &channels);
