@@ -11,6 +11,7 @@ set(srcdirs
         "src/imu"
         "src/imu/mpu6050"
         "src/manager"
+        "src/motor"
 )
 set(includedirs 
         "include"
@@ -22,6 +23,7 @@ set(includedirs
         "include/imu"
         "include/imu/mpu6050"
         "include/manager"
+        "include/motor"
 )
 
 idf_component_register(
