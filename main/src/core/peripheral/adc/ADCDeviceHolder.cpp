@@ -51,7 +51,11 @@ ADCDeviceHolder::~ADCDeviceHolder()
         ADC_CHECK_THROW(adc_oneshot_del_unit(m_one_shot_handler));
     }
     if (m_cali_handler) {
+#ifdef ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+        ADC_CHECK_THROW(adc_cali_delete_scheme_curve_fitting(m_cali_handler));
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
         ADC_CHECK_THROW(adc_cali_delete_scheme_line_fitting(m_cali_handler));
+#endif
     }
 }
 
@@ -123,25 +127,51 @@ void ADCDeviceHolder::configure_one_shot_driver()
 
 void ADCDeviceHolder::configure_calibration()
 {
-    auto line_fitting_scheme = ADC_CALI_SCHEME_VER_LINE_FITTING;
-    if (adc_cali_check_scheme(&line_fitting_scheme) != ESP_OK) {
-        return;
+    try {
+#ifdef ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+        adc_cali_scheme_ver_t scheme = ADC_CALI_SCHEME_VER_CURVE_FITTING;
+        if (adc_cali_check_scheme(&scheme) == ESP_OK) {
+            ESP_LOGI(TAG.data(), "ADC calibration is using curve fitting scheme");
+            configure_curve_fitting_calibration();
+            return;
+        }
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+        adc_cali_scheme_ver_t scheme = ADC_CALI_SCHEME_VER_LINE_FITTING;
+        if (adc_cali_check_scheme(&scheme) == ESP_OK) {
+            ESP_LOGI(TAG.data(), "ADC calibration is using line fitting scheme");
+            configure_line_fitting_calibration();
+            return;
+        }
+#endif
+
+        ESP_LOGW(TAG.data(), "No ADC calibration scheme supported or valid eFuse data missing");
     }
+    catch (const ADCException &e) {
+        ESP_LOGE(TAG.data(), "Calibration configuration failed: %s (0x%X)", e.what(), e.error);
+        m_cali_handler = nullptr;
+    }
+}
 
-    ESP_LOGI(TAG.data(), "Calibration scheme version is ADC_CALI_SCHEME_VER_LINE_FITTING");
-
+#ifdef ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+void ADCDeviceHolder::configure_line_fitting_calibration()
+{
     adc_cali_line_fitting_config_t cali_config{};
     cali_config.unit_id = ADC_UNIT_1;
     cali_config.atten = ATTENUATION;
     cali_config.bitwidth = BITWIDTH;
-
-    try {
-        ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
-    }
-    catch (const ADCException &e) {
-        m_cali_handler = nullptr;
-    }
+    ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
 }
+
+#elif ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+void ADCDeviceHolder::configure_curve_fitting_calibration()
+{
+    adc_cali_curve_fitting_config_t cali_config{};
+    cali_config.unit_id = ADC_UNIT_1;
+    cali_config.atten = ATTENUATION;
+    cali_config.bitwidth = BITWIDTH;
+    ADC_CHECK_THROW(adc_cali_create_scheme_curve_fitting(&cali_config, &m_cali_handler));
+}
+#endif
 
 void ADCDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel_t> &channels)
 {
