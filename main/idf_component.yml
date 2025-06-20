@@ -1,5 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
+  espressif/bdc_motor: "^0.1.0"
   espressif/esp-idf-cxx: 
     version: "^1.0.0"
     pre_release: true
