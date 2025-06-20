@@ -18,33 +18,37 @@
 
 namespace kopter {
 
+/**
+ * @struct Message
+ * @brief Compact fixed-size message suitable for binary communication over UART, ESP-NOW, etc.
+ *
+ * Structure layout (packed, 22 bytes total):
+ * - device_tag[20]: null-terminated ASCII identifier (e.g., "MTR1")
+ * - data: 16-bit signed integer payload
+ */
 struct [[gnu::packed]] Message {
 
-    static constexpr size_t size()
+    /// Total serialized message size in bytes.
+    static constexpr size_t size() noexcept
     {
         return sizeof(device_tag) + sizeof(int16_t);
-    }
+    };
 
-    static Message deserialize(const uint8_t *buffer)
-    {
-        Message message;
-        std::copy(buffer, buffer + sizeof(message.device_tag), reinterpret_cast<uint8_t *>(&message.device_tag));
-        std::copy(buffer + sizeof(message.device_tag), buffer + size(), reinterpret_cast<uint8_t *>(&message.data));
+    /**
+     * @brief Creates a Message instance from a raw byte buffer.
+     * @param buffer Pointer to bytes of data.
+     * @return Deserialized Message object.
+     */
+    static Message deserialize(const uint8_t *buffer);
 
-        return message;
-    }
+    /**
+     * @brief Serializes the message into a raw byte buffer.
+     * @param buffer Pointer to a buffer.
+     */
+    void serialize(uint8_t *buffer) const;
 
-    void serialize(uint8_t *buffer) const
-    {
-        std::copy(reinterpret_cast<const uint8_t *>(&device_tag),
-                  reinterpret_cast<const uint8_t *>(&device_tag) + sizeof(device_tag),
-                  buffer);
-        std::copy(reinterpret_cast<const uint8_t *>(&data),
-                  reinterpret_cast<const uint8_t *>(&data) + sizeof(data),
-                  buffer + sizeof(device_tag));
-    }
-
-    std::string device_tag;
+    static constexpr size_t TAG_SIZE = 20;
+    char device_tag[TAG_SIZE];
     int16_t data;
 };
 
