@@ -13,6 +13,7 @@ set(srcdirs
         "src/manager"
         "src/motor"
         "src/motor/bdc"
+        "src/pid"
 )
 set(includedirs 
         "include"
@@ -26,6 +27,7 @@ set(includedirs
         "include/manager"
         "include/motor"
         "include/motor/bdc"
+        "include/pid"
 )
 
 idf_component_register(
