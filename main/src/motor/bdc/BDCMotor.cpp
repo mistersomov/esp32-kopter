@@ -22,7 +22,7 @@
 namespace kopter {
 
 constexpr uint8_t MCPWM_GROUP_ID = 0;
-constexpr uint32_t MCPWM_FREQ_HZ = 25000;                // 25KHz PWM
+constexpr uint32_t MCPWM_FREQ_HZ = 24500;                // 25KHz PWM
 constexpr uint32_t MCPWM_TIMER_RESOLUTION_HZ = 80000000; // 80MHz, 1 tick = 0.1us
 constexpr uint32_t MCPWM_DUTY_TICK_MAX =
     MCPWM_TIMER_RESOLUTION_HZ / MCPWM_FREQ_HZ; // maximum value we can set for the duty cycle, in ticks
@@ -58,9 +58,11 @@ void BDCMotor::disable()
     check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_disable(m_motor)); });
 }
 
-void BDCMotor::set_speed(uint16_t speed)
+void BDCMotor::set_speed(float speed)
 {
-    check_call<MotorException>([speed, this]() { CHECK_THROW(bdc_motor_set_speed(m_motor, speed)); });
+    check_call<MotorException>([speed, this]() {
+        CHECK_THROW(bdc_motor_set_speed(m_motor, static_cast<uint32_t>(speed * MCPWM_DUTY_TICK_MAX)));
+    });
 }
 
 void BDCMotor::coast()

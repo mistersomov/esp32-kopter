@@ -79,13 +79,12 @@ public:
      * @brief Sets the speed of the motor using a PWM duty cycle.
      *
      * The speed parameter controls the PWM duty cycle applied to the motor.
-     * Valid speed values range from 0 (motor stopped) to 3300 (maximum speed).
      *
-     * @param speed Desired motor speed in the range [0..3300].
+     * @param speed Desired motor speed.
      *
      * @throws MotorException if setting the speed fails.
      */
-    void set_speed(uint16_t speed) override;
+    void set_speed(float speed) override;
 
     /**
      * @brief Coasts the motor, letting it spin freely without applying braking.

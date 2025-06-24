@@ -64,7 +64,7 @@ struct IMotor : public Device {
      * @param speed The speed value to set, typically in the range 0–MAX.
      *              Exact meaning depends on motor implementation.
      */
-    virtual void set_speed(uint16_t speed) = 0;
+    virtual void set_speed(float speed) = 0;
 };
 
 } // namespace kopter
