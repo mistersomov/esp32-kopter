@@ -16,12 +16,11 @@
 
 #pragma once
 
+#include "I2cDevice.hpp"
 #include "IMU.hpp"
 #include "MPU6050Mapper.hpp"
 
 namespace kopter {
-
-class I2cDevice;
 
 /**
  * @class MPU6050
@@ -43,7 +42,7 @@ public:
      * @param name A human-readable name for the device.
      * @param address The I2C address of the MPU6050 sensor.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     MPU6050(const std::string &name, const uint8_t address);
 
@@ -56,7 +55,7 @@ public:
      * @brief Reads the acceleration value along the X axis.
      * @return Acceleration in g.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     float read_ax() const override;
 
@@ -64,7 +63,7 @@ public:
      * @brief Reads the acceleration value along the Y axis.
      * @return Acceleration in g.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     float read_ay() const override;
 
@@ -72,7 +71,7 @@ public:
      * @brief Reads the acceleration value along the Z axis.
      * @return Acceleration in g.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     float read_az() const override;
 
@@ -80,7 +79,7 @@ public:
      * @brief Reads the gyroscope value around the X axis.
      * @return Angular velocity in degrees per second.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     float read_gx() const override;
 
@@ -88,7 +87,7 @@ public:
      * @brief Reads the gyroscope value around the Y axis.
      * @return Angular velocity in degrees per second.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     float read_gy() const override;
 
@@ -96,15 +95,22 @@ public:
      * @brief Reads the gyroscope value around the Z axis.
      * @return Angular velocity in degrees per second.
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     float read_gz() const override;
 
 private:
     /**
+     * @brief Reads raw 16-bit sensor data from the specified register.
      *
+     * This function reads two consecutive bytes starting from the given register address
+     * over I2C and combines them into a signed 16-bit integer. This raw value is typically
+     * used for internal conversion into physical units (e.g., acceleration or rotation rate).
      *
-     * @throw I2cException with the corrsponding esp_err_t return value if something goes wrong
+     * @param reg The starting register address to read from.
+     * @return `int16_t` The raw 16-bit signed value from the sensor.
+     *
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
     int16_t get_raw_value(uint8_t reg) const;
 
