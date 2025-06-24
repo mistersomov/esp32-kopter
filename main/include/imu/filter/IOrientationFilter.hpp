@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "glm/gtc/quaternion.hpp"
+#include <glm/gtc/quaternion.hpp>
 
 namespace kopter {
 
@@ -49,9 +49,9 @@ struct IOrientationFilter {
      * @param gx Gyroscope reading around the X-axis in degrees per second.
      * @param gy Gyroscope reading around the Y-axis in degrees per second.
      * @param gz Gyroscope reading around the Z-axis in degrees per second.
-     * @param ax Accelerometer reading along the X-axis in g.
-     * @param ay Accelerometer reading along the Y-axis in g.
-     * @param az Accelerometer reading along the Z-axis in g.
+     * @param ax Accelerometer reading along the X-axis in m/s².
+     * @param ay Accelerometer reading along the Y-axis in m/s².
+     * @param az Accelerometer reading along the Z-axis in m/s².
      * @param timestamp_us Timestamp of the current measurement in microseconds.
      */
     virtual void update(float gx, float gy, float gz, float ax, float ay, float az, int64_t timestamp_us) = 0;

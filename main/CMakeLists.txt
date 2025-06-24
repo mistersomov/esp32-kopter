@@ -9,6 +9,7 @@ set(srcdirs
         "src/core/peripheral/adc"
         "src/core/peripheral/i2c"
         "src/imu"
+        "src/imu/filter"
         "src/imu/mpu6050"
         "src/manager"
         "src/motor"
