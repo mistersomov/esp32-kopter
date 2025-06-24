@@ -28,12 +28,12 @@ I2cDevice::I2cDevice(const std::string &name, const idf::I2CAddress &address, I2
 
 void I2cDevice::write(const std::vector<uint8_t> &data)
 {
-    wrap_i2c([&] { m_master->sync_write(m_address, data); });
+    check_call<I2cException>([&] { m_master->sync_write(m_address, data); });
 }
 
 std::vector<uint8_t> I2cDevice::read(const uint8_t reg, const uint16_t n_bytes)
 {
-    return wrap_i2c([&] {
+    return check_call<I2cException>([&] {
         m_master->sync_write(m_address, {reg});
         return m_master->sync_read(m_address, n_bytes);
     });
