@@ -40,16 +40,14 @@ public:
      * @brief Constructs and initializes the PID control block with default parameters.
      *
      * This constructor creates a new instance of the ESP-IDF PID controller using
-     * default tuning parameters (Kp, Ki, Kd) and sets the output limits from `0.0f` to `max_output`.
+     * default tuning parameters (Kp, Ki, Kd) and sets the output limits from `0.0f` to `1.0f`.
      *
      * The controller is ready to use immediately after construction. If needed,
      * further tuning can be done by modifying the PID parameters in the implementation.
      *
-     * @param max_output Maximum absolute value of the control output.
-     *
      * @throws PIDException if the PID control block could not be created or initialized.
      */
-    explicit PID(float max_output);
+    PID();
 
     /**
      * Dtor with deleting a `pid_ctrl_block_handle_t` member.

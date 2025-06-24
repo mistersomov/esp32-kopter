@@ -39,6 +39,7 @@ BDCMotor::BDCMotor(const std::string &name, gpio_num_t gpio) : IMotor(std::move(
 
     check_call<MotorException>(
         [&]() { CHECK_THROW(bdc_motor_new_mcpwm_device(&motor_config, &mcpwm_config, &m_motor)); });
+    enable();
 }
 
 BDCMotor::~BDCMotor()
