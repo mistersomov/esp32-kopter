@@ -17,9 +17,7 @@
 #include "pch.hpp"
 #include "ComplementaryFilter.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/constants.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 namespace kopter {
 
@@ -66,11 +64,10 @@ void ComplementaryFilter::apply_gyro_influence(float gx, float gy, float gz, flo
 void ComplementaryFilter::apply_accel_influence(float ax, float ay, float az, float dt)
 {
     glm::vec3 accel = glm::normalize(glm::vec3(ax, ay, az));
-    glm::vec3 gravity_world = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 z_axis = m_quat * gravity_world;
-    glm::quat accel_quat = glm::rotation(z_axis, accel);
-    glm::quat adjusted = glm::slerp(glm::quat(), accel_quat, 1.0f - m_alpha);
-    m_quat = glm::normalize(adjusted * m_quat);
+    float pitch = std::atan2f(-accel.x, sqrtf(accel.y * accel.y + accel.z * accel.z));
+    float roll = std::atan2f(accel.y, accel.z);
+    glm::quat accel_quat = glm::angleAxis(roll, glm::vec3(1, 0, 0)) * glm::angleAxis(pitch, glm::vec3(0, 1, 0));
+    m_quat = glm::normalize(glm::slerp(m_quat, accel_quat, 1.0f - m_alpha));
 }
 
 } // namespace kopter
