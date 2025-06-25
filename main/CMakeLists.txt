@@ -29,6 +29,7 @@ set(includedirs
         "include/manager"
         "include/motor"
         "include/motor/bdc"
+        "include/motor/mixer"
         "include/pid"
 )
 
