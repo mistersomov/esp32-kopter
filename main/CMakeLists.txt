@@ -14,6 +14,7 @@ set(srcdirs
         "src/manager"
         "src/motor"
         "src/motor/bdc"
+        "src/motor/mixer"
         "src/pid"
 )
 set(includedirs 
