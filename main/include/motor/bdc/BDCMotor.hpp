@@ -24,7 +24,6 @@
 namespace kopter {
 
 /**
- * @class BDCMotor
  * @brief Represents a brushed DC (BDC) motor controlled via MCPWM on ESP-IDF.
  *
  * This class provides a C++ interface to control a brushed DC motor using the ESP-IDF
@@ -42,15 +41,13 @@ public:
     /**
      * @brief Ctor a BDCMotor instance.
      *
-     * Initializes the underlying motor driver with the specified PWM GPIO pin and default
-     * PWM settings (25 kHz frequency, 80 MHz timer resolution).
+     * Initializes the underlying motor driver with the specified PWM GPIO pin.
      *
-     * @param name A string identifier for the motor, used for logging/debugging.
      * @param gpio The GPIO number connected to the motor's PWM control input.
      *
      * @throws MotorException if initialization of the motor driver fails.
      */
-    BDCMotor(const std::string &name, gpio_num_t gpio);
+    BDCMotor(gpio_num_t gpio);
 
     /**
      * @brief Dtor for BDCMotor.

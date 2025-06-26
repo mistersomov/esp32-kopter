@@ -16,36 +16,42 @@
 
 #pragma once
 
-#include "Device.hpp"
 #include "I2cException.hpp"
+#include "IDevice.hpp"
 
 #include "i2c_cxx.hpp"
 
 namespace kopter {
 
 /**
- * @class I2cDevice
  * @brief Represents a generic I2C device connected to a shared I2C master.
  *
  * This class provides an abstraction over an I2C device that communicates via a shared I2C master interface.
  * It enables sending and receiving data over I2C using high-level C++ constructs, and can be extended by
  * specific device implementations (e.g. MPU6050, EEPROM, etc.).
  */
-class I2cDevice : public Device {
+class I2cDevice : public IDevice {
 public:
     /**
      * @brief Ctor for an I2cDevice with a name, I2C address, and a shared I2C master.
      *
-     * @param name Device identifier used in logs or messaging.
      * @param address I2C address of the device.
      * @param shared_master Pointer to a shared I2CMaster instance responsible for communication.
      */
-    explicit I2cDevice(const std::string &name, const idf::I2CAddress &address, idf::I2CMaster *shared_master) noexcept;
+    I2cDevice(const idf::I2CAddress &address, idf::I2CMaster *shared_master);
 
     /**
      * @brief Virtual dtor.
      */
     virtual ~I2cDevice() override = default;
+
+    /**
+     * @brief Returns the name of the I2cDevice.
+     *
+     * @return A null-terminated C-style string representing the device name.
+     *         The returned pointer must remain valid for the lifetime of the device.
+     */
+    virtual const char *get_name() const noexcept override;
 
     /**
      * @brief Writes a buffer of bytes to the I2C device.

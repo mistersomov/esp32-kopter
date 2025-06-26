@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "Device.hpp"
+#include "IDevice.hpp"
 
 namespace kopter {
 
@@ -28,21 +28,26 @@ namespace kopter {
  * This class is intended to be subclassed by specific IMU implementations
  * (e.g., MPU6050) that handle actual communication with hardware.
  *
- * It inherits from the generic Device class to maintain consistent naming
- * and device abstraction across the project.
+ * It implements the interface `IDevice`.
  */
-struct IMU : public Device {
+struct IMU : public IDevice {
     /**
      * @brief Ctor an IMU device with the given name.
-     *
-     * @param name Logical name of the IMU device for identification.
      */
-    explicit IMU(const std::string &name) noexcept;
+    IMU();
 
     /**
      * @brief Virtual dtor for proper cleanup of derived classes.
      */
     virtual ~IMU() override = default;
+
+    /**
+     * @brief Returns the name of the IMU.
+     *
+     * @return A null-terminated C-style string representing the device name.
+     *         The returned pointer must remain valid for the lifetime of the device.
+     */
+    virtual const char *get_name() const noexcept override;
 
     /**
      * @brief Reads the acceleration along the X-axis in g.

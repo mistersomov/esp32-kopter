@@ -21,9 +21,14 @@ using namespace idf;
 
 namespace kopter {
 
-I2cDevice::I2cDevice(const std::string &name, const idf::I2CAddress &address, I2CMaster *shared_master) noexcept
-    : Device(std::move(name)), m_address{address}, m_master{shared_master}
+I2cDevice::I2cDevice(const idf::I2CAddress &address, I2CMaster *shared_master)
+    : IDevice(), m_address{address}, m_master{shared_master}
 {
+}
+
+const char *I2cDevice::get_name() const noexcept
+{
+    return "[I2cDevice]";
 }
 
 void I2cDevice::write(const std::vector<uint8_t> &data)

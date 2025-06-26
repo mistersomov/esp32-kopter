@@ -65,9 +65,9 @@ ADCDeviceHolder &ADCDeviceHolder::get_instance()
     return instance;
 }
 
-Device *ADCDeviceHolder::add_device(const std::string &name,
-                                    ADCMode mode,
-                                    const std::unordered_set<adc_channel_t> &channels)
+ADCDevice *ADCDeviceHolder::add_device(const std::string &name,
+                                       ADCMode mode,
+                                       const std::unordered_set<adc_channel_t> &channels)
 {
     assert(m_continuous_handler);
 
@@ -86,7 +86,7 @@ Device *ADCDeviceHolder::add_device(const std::string &name,
         strategy = std::make_unique<OneShotReadStrategy>(m_one_shot_handler, m_cali_handler, channels);
     }
 
-    m_devices[name] = std::make_unique<ADCDevice>(std::move(name), std::move(strategy));
+    m_devices[name] = std::make_unique<ADCDevice>(std::move(strategy));
     return m_devices[name].get();
 }
 

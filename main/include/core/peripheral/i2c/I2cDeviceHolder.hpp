@@ -27,7 +27,7 @@ public:
     ~I2cDeviceHolder() = default;
 
     static I2cDeviceHolder &get_instance();
-    Device *add_device(const std::string &name, const uint8_t &address);
+    I2cDevice *add_device(const std::string &name, const uint8_t &address);
 
 private:
     I2cDeviceHolder();

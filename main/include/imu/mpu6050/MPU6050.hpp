@@ -23,7 +23,6 @@
 namespace kopter {
 
 /**
- * @class MPU6050
  * @brief Represents an MPU6050 IMU sensor connected over I2C.
  *
  * This class provides access to raw accelerometer and gyroscope data
@@ -39,17 +38,24 @@ public:
     /**
      * @brief Ctor an MPU6050 with the default value mapper.
      *
-     * @param name A human-readable name for the device.
      * @param address The I2C address of the MPU6050 sensor.
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    MPU6050(const std::string &name, const uint8_t address);
+    MPU6050(const uint8_t address);
 
     /**
      * @brief Default dtor.
      */
     ~MPU6050() override = default;
+
+    /**
+     * @brief Returns the `"[MPU6050]"`.
+     *
+     * @return A null-terminated C-style string representing the device name.
+     *         The returned pointer must remain valid for the lifetime of the device.
+     */
+    const char *get_name() const noexcept override;
 
     /**
      * @brief Reads the acceleration value along the X axis.

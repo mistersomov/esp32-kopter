@@ -16,16 +16,47 @@
 
 #pragma once
 
-#include "Device.hpp"
 #include "IADCReadStrategy.hpp"
+#include "IDevice.hpp"
 
 namespace kopter {
 
-class ADCDevice : public Device {
+/**
+ * @brief Represents a generic ADC (Analog-to-Digital Converter) device using a configurable read strategy.
+ *
+ * The ADCDevice class abstracts an analog input device, delegating the actual data sampling
+ * to a strategy that implements the IADCReadStrategy interface. This allows flexible implementation
+ * for continuous, one-shot, or custom ADC read modes.
+ */
+class ADCDevice : public IDevice {
 public:
-    ADCDevice(const std::string &name, std::unique_ptr<IADCReadStrategy> strategy);
-    virtual ~ADCDevice();
+    /**
+     * @brief Ctor for a new `ADCDevice` with a specific ADC read strategy.
+     *
+     * @param strategy A unique pointer to an `IADCReadStrategy` implementation used to perform ADC reads.
+     */
+    ADCDevice(std::unique_ptr<IADCReadStrategy> strategy);
 
+    /**
+     * @brief Destroys the ADCDevice instance and releases owned resources.
+     */
+    virtual ~ADCDevice() override;
+
+    /**
+     * @brief Returns the name of the ADCDevice.
+     *
+     * @return A null-terminated C-style string representing the device name.
+     *         The returned pointer must remain valid for the lifetime of the device.
+     */
+    virtual const char *get_name() const noexcept override;
+
+    /**
+     * @brief Initiates an ADC read operation using the provided callback.
+     *
+     * The actual read behavior depends on the internal strategy implementation.
+     *
+     * @param cb A callback function that will receive the read float value.
+     */
     void read(reading_callback cb);
 
 private:

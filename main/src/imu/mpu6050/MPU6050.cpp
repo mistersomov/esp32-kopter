@@ -18,6 +18,7 @@
 #include "MPU6050.hpp"
 
 #include "I2cDeviceHolder.hpp"
+#include "IMU.hpp"
 
 namespace kopter {
 
@@ -29,16 +30,20 @@ static constexpr uint8_t GY_UPPER_BYTE = 0x45;
 static constexpr uint8_t GZ_UPPER_BYTE = 0x47;
 static constexpr uint8_t BYTES_PER_AXIS = 2;
 
-MPU6050::MPU6050(const std::string &name, const uint8_t address)
-    : IMU(std::move(name)), m_mapper{std::make_unique<MPU6050Mapper>()}
+MPU6050::MPU6050(const uint8_t address) : IMU(), m_mapper{std::make_unique<MPU6050Mapper>()}
 {
     m_i2c_device.reset(
-        static_cast<I2cDevice *>(I2cDeviceHolder::get_instance().add_device(std::move(name), std::move(address))));
+        static_cast<I2cDevice *>(I2cDeviceHolder::get_instance().add_device(get_name(), std::move(address))));
 
     assert(m_i2c_device);
 
     m_i2c_device->write({0x6B, 0x00});
     vTaskDelay(pdMS_TO_TICKS(100));
+}
+
+const char *MPU6050::get_name() const noexcept
+{
+    return "[MPU6050]";
 }
 
 float MPU6050::read_ax() const

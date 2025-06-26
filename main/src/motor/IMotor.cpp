@@ -19,8 +19,13 @@
 
 namespace kopter {
 
-IMotor::IMotor(const std::string &name) : Device(std::move(name))
+IMotor::IMotor() : IDevice()
 {
+}
+
+const char *IMotor::get_name() const noexcept
+{
+    return "[Motor]";
 }
 
 } // namespace kopter

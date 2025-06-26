@@ -16,12 +16,11 @@
 
 #pragma once
 
-#include "Device.hpp"
+#include "IDevice.hpp"
 
 namespace kopter {
 
 /**
- * @interface IMotor
  * @brief Interface representing a motor device.
  *
  * This structure defines a pure virtual interface for a motor, providing
@@ -29,20 +28,26 @@ namespace kopter {
  * All implementations of this interface must provide definitions for the
  * listed methods.
  *
- * Inherits from the Device class.
+ * Inherits from the IDevice class.
  */
-struct IMotor : public Device {
+struct IMotor : public IDevice {
     /**
      * @brief Ctor with the given name.
-     *
-     * @param name The name of the motor device.
      */
-    IMotor(const std::string &name);
+    IMotor();
 
     /**
      * @brief Virtual dtor for Motor.
      */
     virtual ~IMotor() = default;
+
+    /**
+     * @brief Returns the name of the motor.
+     *
+     * @return A null-terminated C-style string representing the device name.
+     *         The returned pointer must remain valid for the lifetime of the device.
+     */
+    virtual const char *get_name() const noexcept override;
 
     /**
      * @brief Enable the motor.

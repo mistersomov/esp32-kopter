@@ -17,28 +17,44 @@
 #include "pch.hpp"
 #include "BDCMotor.hpp"
 
+#include "IMotor.hpp"
 #include "MotorException.hpp"
 
 namespace kopter {
 
-constexpr uint8_t MCPWM_GROUP_ID = 0;
+constexpr uint8_t MCPWM_GROUP_ID_0 = 0;
+constexpr uint8_t MCPWM_GROUP_ID_1 = 1;
 constexpr uint32_t MCPWM_FREQ_HZ = 24500;                // 25KHz PWM
 constexpr uint32_t MCPWM_TIMER_RESOLUTION_HZ = 80000000; // 80MHz, 1 tick = 0.1us
 constexpr uint32_t MCPWM_DUTY_TICK_MAX =
     MCPWM_TIMER_RESOLUTION_HZ / MCPWM_FREQ_HZ; // maximum value we can set for the duty cycle, in ticks
 
-BDCMotor::BDCMotor(const std::string &name, gpio_num_t gpio) : IMotor(std::move(name))
+BDCMotor::BDCMotor(gpio_num_t gpio) : IMotor()
 {
     bdc_motor_config_t motor_config{};
     motor_config.pwm_freq_hz = MCPWM_FREQ_HZ;
     motor_config.pwma_gpio_num = gpio;
 
     bdc_motor_mcpwm_config_t mcpwm_config{};
-    mcpwm_config.group_id = MCPWM_GROUP_ID;
+    mcpwm_config.group_id = MCPWM_GROUP_ID_0;
     mcpwm_config.resolution_hz = MCPWM_TIMER_RESOLUTION_HZ;
 
-    check_call<MotorException>(
-        [&]() { CHECK_THROW(bdc_motor_new_mcpwm_device(&motor_config, &mcpwm_config, &m_motor)); });
+    try {
+        check_call<MotorException>(
+            [&]() { CHECK_THROW(bdc_motor_new_mcpwm_device(&motor_config, &mcpwm_config, &m_motor)); });
+    }
+    catch (const MotorException &e) {
+        // If MCPWM group 0 is unavailable, fallback to group 1
+        if (e.error == ESP_ERR_NOT_FOUND) {
+            mcpwm_config.group_id = MCPWM_GROUP_ID_1;
+
+            check_call<MotorException>(
+                [&]() { CHECK_THROW(bdc_motor_new_mcpwm_device(&motor_config, &mcpwm_config, &m_motor)); });
+        }
+        else {
+            throw e;
+        }
+    }
     enable();
 }
 

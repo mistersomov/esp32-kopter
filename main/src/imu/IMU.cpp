@@ -19,8 +19,13 @@
 
 namespace kopter {
 
-IMU::IMU(const std::string &name) noexcept : Device(std::move(name))
+IMU::IMU() : IDevice()
 {
+}
+
+const char *IMU::get_name() const noexcept
+{
+    return "[IMU]";
 }
 
 } // namespace kopter

@@ -37,7 +37,7 @@ I2cDeviceHolder &I2cDeviceHolder::get_instance()
     return instance;
 }
 
-Device *I2cDeviceHolder::add_device(const std::string &name, const uint8_t &address)
+I2cDevice *I2cDeviceHolder::add_device(const std::string &name, const uint8_t &address)
 {
     assert(m_master);
 
@@ -46,7 +46,7 @@ Device *I2cDeviceHolder::add_device(const std::string &name, const uint8_t &addr
     }
 
     try {
-        m_devices[name] = std::make_unique<I2cDevice>(std::move(name), I2CAddress(std::move(address)), m_master.get());
+        m_devices[name] = std::make_unique<I2cDevice>(I2CAddress(std::move(address)), m_master.get());
         return m_devices[name].get();
     }
     catch (const I2CException &e) {

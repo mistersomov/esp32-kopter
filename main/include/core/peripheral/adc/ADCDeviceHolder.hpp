@@ -28,7 +28,7 @@ public:
     ~ADCDeviceHolder();
 
     static ADCDeviceHolder &get_instance();
-    Device *add_device(const std::string &name, ADCMode mode, const std::unordered_set<adc_channel_t> &channels);
+    ADCDevice *add_device(const std::string &name, ADCMode mode, const std::unordered_set<adc_channel_t> &channels);
 
 private:
     ADCDeviceHolder();
@@ -49,7 +49,7 @@ private:
     adc_continuous_handle_t m_continuous_handler{nullptr};
     adc_oneshot_unit_handle_t m_one_shot_handler{nullptr};
     adc_cali_handle_t m_cali_handler{nullptr};
-    std::unordered_map<std::string, std::unique_ptr<Device>> m_devices;
+    std::unordered_map<std::string, std::unique_ptr<ADCDevice>> m_devices;
 };
 
 } // namespace kopter

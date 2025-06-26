@@ -20,8 +20,7 @@
 
 namespace kopter {
 
-ADCDevice::ADCDevice(const std::string &name, std::unique_ptr<IADCReadStrategy> strategy)
-    : Device{name}, m_read_strategy{std::move(strategy)}
+ADCDevice::ADCDevice(std::unique_ptr<IADCReadStrategy> strategy) : IDevice(), m_read_strategy{std::move(strategy)}
 {
 }
 
@@ -29,10 +28,15 @@ ADCDevice::~ADCDevice()
 {
 }
 
+const char *ADCDevice::get_name() const noexcept
+{
+    return "[ADCDevice]";
+}
+
 void ADCDevice::read(reading_callback cb)
 {
     if (!m_read_strategy) {
-        ESP_LOGE(get_tag().c_str(), "Read strategy not set.");
+        ESP_LOGE(get_name(), "Read strategy not set.");
         throw ADCException(ESP_ERR_INVALID_STATE);
     }
     m_read_strategy->read(cb);
