@@ -33,7 +33,7 @@ private:
     I2cDeviceHolder();
 
     std::unique_ptr<idf::I2CMaster> m_master{nullptr};
-    std::unordered_map<std::string, std::unique_ptr<Device>> m_devices;
+    std::unordered_map<std::string, std::unique_ptr<I2cDevice>> m_devices;
 };
 
 } // namespace kopter
