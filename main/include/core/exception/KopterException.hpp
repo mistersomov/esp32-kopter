@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+#pragma once
+
 #include "esp_exception.hpp"
 
 namespace kopter {
