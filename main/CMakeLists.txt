@@ -24,6 +24,7 @@ set(includedirs
         "include/core/peripheral"
         "include/core/peripheral/adc"
         "include/core/peripheral/i2c"
+        "include/core/utils"
         "include/imu"
         "include/imu/filter"
         "include/imu/mpu6050"
