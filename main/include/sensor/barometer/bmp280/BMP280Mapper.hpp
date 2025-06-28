@@ -28,10 +28,7 @@ public:
     BMP280Mapper();
 
     /**
-     * @brief Maps or transforms the raw temperature value.
-     *
-     * This method is expected to return a calibrated, filtered, or otherwise transformed
-     * temperature value.
+     * @brief Maps the raw temperature value.
      *
      * @param raw 32-bit signed raw value from the sensor.
      * @return Transformed temperature in degrees Celsius.
@@ -39,22 +36,53 @@ public:
     float map_temperature(int32_t raw, BMP280Calibration &calib);
 
     /**
-     * @brief Maps or transforms the raw pressure value.
-     *
-     * This method is expected to return a calibrated, filtered, or otherwise transformed
-     * atmospheric pressure value.
+     * @brief Maps the raw pressure value.
      *
      * @param raw 32-bit unsigned raw value from the sensor.
      * @return Transformed pressure in Pascals (Pa).
      */
     float map_pressure(uint32_t raw, BMP280Calibration &calib);
 
+    /**
+     * @brief Maps the calculated pressure value into altitude.
+     *
+     * @param raw 32-bit unsigned raw value from the sensor.
+     * @return Transformed pressure in Pascals (Pa).
+     */
     float map_altitude(float pressure);
 
 private:
+    /**
+     * @brief Compensates the raw temperature reading using the calibration data.
+     *
+     * This method applies the BMP280 temperature compensation algorithm
+     * and stores an intermediate fine temperature value used for pressure calculation.
+     *
+     * @param adc_t Raw temperature value from the BMP280 sensor (signed 32-bit integer).
+     * @param calib Reference to the BMP280 calibration data.
+     * @return Compensated temperature in degrees Celsius.
+     */
     float get_compensated_temperature(int32_t adc_t, BMP280Calibration &calib);
+
+    /**
+     * @brief Compensates the raw pressure reading using the calibration data.
+     *
+     * This method applies the BMP280 pressure compensation algorithm.
+     * It uses the internally stored fine temperature value `m_t_fine`
+     * from the last temperature compensation.
+     *
+     * @param adc_p Raw pressure value from the BMP280 sensor (unsigned 32-bit integer).
+     * @param calib Reference to the BMP280 calibration data.
+     * @return Compensated pressure in Pascals (Pa).
+     */
     float get_compensated_pressure(uint32_t adc_p, BMP280Calibration &calib);
 
+    /**
+     * @brief Intermediate temperature value used in pressure compensation.
+     *
+     * This value is calculated during temperature compensation and reused
+     * during pressure compensation according to the BMP280 datasheet.
+     */
     int32_t m_t_fine;
 };
 

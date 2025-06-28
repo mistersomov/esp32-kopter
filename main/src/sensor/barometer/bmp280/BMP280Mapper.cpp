@@ -23,6 +23,7 @@ namespace kopter {
 static constexpr float SEA_LEVEL_PRESSURE = 101325.0f;
 static constexpr float ALTITUDE_SCALE = 44330.0f;
 static constexpr float ALTITUDE_EXPONENT = 0.1903f;
+static constexpr float HPA2PA = 256.0f * 100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
 
 BMP280Mapper::BMP280Mapper() : m_t_fine{0}
 {
@@ -92,8 +93,7 @@ float BMP280Mapper::get_compensated_pressure(uint32_t adc_p, BMP280Calibration &
     pressure = ((pressure + var1 + var2) >> 8) + (dig_P7 << 4);
     pressure = static_cast<uint32_t>(pressure);
 
-    return static_cast<float>(pressure) / 256.0f *
-           100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
+    return static_cast<float>(pressure) / HPA2PA;
 }
 
 } // namespace kopter
