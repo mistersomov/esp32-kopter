@@ -16,6 +16,7 @@ set(srcdirs
         "src/motor/bdc"
         "src/motor/mixer"
         "src/pid"
+        "src/sensor/barometer"
 )
 set(includedirs 
         "include"
@@ -33,6 +34,7 @@ set(includedirs
         "include/motor/bdc"
         "include/motor/mixer"
         "include/pid"
+        "include/sensor/barometer"
 )
 
 idf_component_register(
