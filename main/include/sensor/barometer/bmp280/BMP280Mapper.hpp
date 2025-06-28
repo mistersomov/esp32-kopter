@@ -16,23 +16,16 @@
 
 #pragma once
 
+#include "BMP280Calibration.hpp"
+
 namespace kopter {
 
 /**
- * @brief Interface for transforming barometric sensor readings.
- *
- * This interface allows implementing different mapping or transformation strategies
- * for values obtained from a barometer (e.g., applying calibration offsets, unit conversions,
- * or filtering).
- *
- * Typical use cases include sensor calibration, smoothing via filters, or mapping
- * values to different reference frames or units.
+ * @brief Mapper for BMP280 readings.
  */
-struct IBarometerValueMapper {
-    /**
-     * @brief Virtual dtor.
-     */
-    virtual ~IBarometerValueMapper() = default;
+class BMP280Mapper {
+public:
+    BMP280Mapper();
 
     /**
      * @brief Maps or transforms the raw temperature value.
@@ -40,9 +33,10 @@ struct IBarometerValueMapper {
      * This method is expected to return a calibrated, filtered, or otherwise transformed
      * temperature value.
      *
+     * @param raw 32-bit signed raw value from the sensor.
      * @return Transformed temperature in degrees Celsius.
      */
-    virtual float map_temperature() = 0;
+    float map_temperature(int32_t raw, BMP280Calibration &calib);
 
     /**
      * @brief Maps or transforms the raw pressure value.
@@ -50,9 +44,18 @@ struct IBarometerValueMapper {
      * This method is expected to return a calibrated, filtered, or otherwise transformed
      * atmospheric pressure value.
      *
+     * @param raw 32-bit unsigned raw value from the sensor.
      * @return Transformed pressure in Pascals (Pa).
      */
-    virtual float map_pressure() = 0;
+    float map_pressure(uint32_t raw, BMP280Calibration &calib);
+
+    float map_altitude(float pressure);
+
+private:
+    float get_compensated_temperature(int32_t adc_t, BMP280Calibration &calib);
+    float get_compensated_pressure(uint32_t adc_p, BMP280Calibration &calib);
+
+    int32_t m_t_fine;
 };
 
 } // namespace kopter
