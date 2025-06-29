@@ -38,6 +38,7 @@ public:
     Impl(uint8_t address) : m_mapper{std::make_unique<BMP280Mapper>()}, m_calib{}
     {
         m_i2c_device.reset(I2cDeviceHolder::get_instance().add_device("BMP280", address));
+        assert(m_i2c_device);
         set_ctrl_meas();
         set_config();
         set_calib_data();

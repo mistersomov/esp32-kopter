@@ -77,13 +77,13 @@ float MPU6050Mapper::map_gyro_z(int16_t raw) const
 float MPU6050Mapper::map_accel(int16_t value, AccelSensitivityMode mode) const
 {
     switch (mode) {
-    case AccelSensitivityMode::TWO_G:
+    case AccelSensitivityMode::A2G:
         return value / AFS_SEL_0;
-    case AccelSensitivityMode::FOUR_G:
+    case AccelSensitivityMode::A4G:
         return value / AFS_SEL_1;
-    case AccelSensitivityMode::EIGHT_G:
+    case AccelSensitivityMode::A8G:
         return value / AFS_SEL_2;
-    case AccelSensitivityMode::SIXTEEN_G:
+    case AccelSensitivityMode::A16G:
         return value / AFS_SEL_3;
     default:
         return value / AFS_SEL_0;

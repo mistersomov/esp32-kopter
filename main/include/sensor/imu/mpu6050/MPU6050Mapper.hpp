@@ -21,20 +21,18 @@
 namespace kopter {
 
 /**
- * @enum AccelSensivityMode
  * @brief Represents accelerometer sensitivity settings for the MPU6050.
  *
  * The higher the G-force range, the less sensitive the readings (but more tolerant to higher accelerations).
  */
 enum class AccelSensitivityMode {
-    TWO_G,
-    FOUR_G,
-    EIGHT_G,
-    SIXTEEN_G
+    A2G,
+    A4G,
+    A8G,
+    A16G
 };
 
 /**
- * @enum GyroSensivityMode
  * @brief Represents gyroscope sensitivity settings for the MPU6050.
  *
  * Typically maps to angular velocity ranges like ±250, ±500, ±1000, and ±2000 degrees/second.
@@ -47,7 +45,6 @@ enum class GyroSensitivityMode {
 };
 
 /**
- * @class MPU6050Mapper
  * @brief Provides default conversion of raw IMU data to physical units for the MPU6050 sensor.
  *
  * This class implements the IIMUValueMapper interface and provides default
@@ -63,16 +60,16 @@ public:
     /**
      * @brief Ctor with configurable sensitivity for each axis.
      *
-     * @param ax_mode Sensitivity for accelerometer X axis (default: TWO_G)
-     * @param ay_mode Sensitivity for accelerometer Y axis (default: TWO_G)
-     * @param az_mode Sensitivity for accelerometer Z axis (default: TWO_G)
+     * @param ax_mode Sensitivity for accelerometer X axis (default: A2G)
+     * @param ay_mode Sensitivity for accelerometer Y axis (default: A2G)
+     * @param az_mode Sensitivity for accelerometer Z axis (default: A2G)
      * @param gx_mode Sensitivity for gyroscope X axis (default: DPS_250 = ±250°/s)
      * @param gy_mode Sensitivity for gyroscope Y axis (default: DPS_250 = ±250°/s)
      * @param gz_mode Sensitivity for gyroscope Z axis (default: DPS_250 = ±250°/s)
      */
-    explicit MPU6050Mapper(AccelSensitivityMode ax_mode = AccelSensitivityMode::TWO_G,
-                           AccelSensitivityMode ay_mode = AccelSensitivityMode::TWO_G,
-                           AccelSensitivityMode az_mode = AccelSensitivityMode::TWO_G,
+    explicit MPU6050Mapper(AccelSensitivityMode ax_mode = AccelSensitivityMode::A2G,
+                           AccelSensitivityMode ay_mode = AccelSensitivityMode::A2G,
+                           AccelSensitivityMode az_mode = AccelSensitivityMode::A2G,
                            GyroSensitivityMode gx_mode = GyroSensitivityMode::DPS_250,
                            GyroSensitivityMode gy_mode = GyroSensitivityMode::DPS_250,
                            GyroSensitivityMode gz_mode = GyroSensitivityMode::DPS_250) noexcept;

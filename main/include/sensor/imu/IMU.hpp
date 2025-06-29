@@ -27,8 +27,6 @@ namespace kopter {
  * accelerometer and gyroscope data along three axes (X, Y, Z).
  * This class is intended to be subclassed by specific IMU implementations
  * (e.g., MPU6050) that handle actual communication with hardware.
- *
- * It implements the interface `IDevice`.
  */
 struct IMU : public IDevice {
     /**
