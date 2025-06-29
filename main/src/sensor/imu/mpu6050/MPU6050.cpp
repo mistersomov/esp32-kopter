@@ -27,8 +27,8 @@ static constexpr uint8_t DEVICE_RESET = 0x01;
 static constexpr uint8_t SLEEP_MODE = 0x00;
 static constexpr uint8_t ACCEL_CONFIG_REG = 0x1C;
 static constexpr uint8_t GYRO_CONFIG_REG = 0x1B;
-static constexpr uint8_t ACCEL_2G = 0x00;    // default
-static constexpr uint8_t GYRO_250DPS = 0x00; // default
+static constexpr uint8_t ACCEL_2G = 0x00;
+static constexpr uint8_t GYRO_250DPS = 0x00;
 static constexpr uint8_t REG_AX_H = 0x3B;
 static constexpr uint8_t REG_AY_H = 0x3D;
 static constexpr uint8_t REG_AZ_H = 0x3F;
@@ -122,7 +122,7 @@ private:
     }
 
     std::unique_ptr<I2cDevice> m_i2c_device;
-    std::unique_ptr<IIMUValueMapper> m_mapper;
+    std::unique_ptr<MPU6050Mapper> m_mapper;
 };
 
 MPU6050::MPU6050(uint8_t address) : IMU(), m_impl{std::make_unique<MPU6050Impl>(address)}

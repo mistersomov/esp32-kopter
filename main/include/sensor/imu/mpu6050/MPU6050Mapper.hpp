@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "IIMUValueMapper.hpp"
-
 namespace kopter {
 
 /**
@@ -47,15 +45,14 @@ enum class GyroSensitivityMode {
 /**
  * @brief Provides default conversion of raw IMU data to physical units for the MPU6050 sensor.
  *
- * This class implements the IIMUValueMapper interface and provides default
- * conversions for raw accelerometer and gyroscope values retrieved from the MPU6050 sensor.
+ * This class provides default conversions for raw accelerometer and gyroscope values retrieved from the MPU6050 sensor.
  * These conversions typically depend on the sensor's sensitivity settings (not shown here),
  * but the implementation assumes default sensitivity modes unless extended.
  *
  * The mapping functions convert 16-bit signed raw sensor data into floating-point values
  * representing either acceleration (in g) or angular velocity (in degrees per second).
  */
-class MPU6050Mapper : public IIMUValueMapper {
+class MPU6050Mapper {
 public:
     /**
      * @brief Ctor with configurable sensitivity for each axis.
@@ -75,51 +72,46 @@ public:
                            GyroSensitivityMode gz_mode = GyroSensitivityMode::DPS_250) noexcept;
 
     /**
-     * @brief Default dtor.
-     */
-    ~MPU6050Mapper() override = default;
-
-    /**
      * @brief Maps raw X-axis accelerometer value to acceleration in g.
      * @param raw Raw 16-bit value from sensor.
      * @return Acceleration in g.
      */
-    float map_accel_x(int16_t raw) const override;
+    float map_accel_x(int16_t raw) const;
 
     /**
      * @brief Maps raw Y-axis accelerometer value to acceleration in g.
      * @param raw Raw 16-bit value from sensor.
      * @return Acceleration in g.
      */
-    float map_accel_y(int16_t raw) const override;
+    float map_accel_y(int16_t raw) const;
 
     /**
      * @brief Maps raw Z-axis accelerometer value to acceleration in g.
      * @param raw Raw 16-bit value from sensor.
      * @return Acceleration in g.
      */
-    float map_accel_z(int16_t raw) const override;
+    float map_accel_z(int16_t raw) const;
 
     /**
      * @brief Maps raw X-axis gyroscope value to angular velocity in degrees per second.
      * @param raw Raw 16-bit value from sensor.
      * @return Angular velocity in °/s.
      */
-    float map_gyro_x(int16_t raw) const override;
+    float map_gyro_x(int16_t raw) const;
 
     /**
      * @brief Maps raw Y-axis gyroscope value to angular velocity in degrees per second.
      * @param raw Raw 16-bit value from sensor.
      * @return Angular velocity in °/s.
      */
-    float map_gyro_y(int16_t raw) const override;
+    float map_gyro_y(int16_t raw) const;
 
     /**
      * @brief Maps raw Z-axis gyroscope value to angular velocity in degrees per second.
      * @param raw Raw 16-bit value from sensor.
      * @return Angular velocity in °/s.
      */
-    float map_gyro_z(int16_t raw) const override;
+    float map_gyro_z(int16_t raw) const;
 
 private:
     /**
