@@ -32,8 +32,7 @@ static constexpr uint8_t BYTES_PER_AXIS = 2;
 
 MPU6050::MPU6050(const uint8_t address) : IMU(), m_mapper{std::make_unique<MPU6050Mapper>()}
 {
-    m_i2c_device.reset(
-        static_cast<I2cDevice *>(I2cDeviceHolder::get_instance().add_device(get_name(), std::move(address))));
+    m_i2c_device.reset(I2cDeviceHolder::get_instance().add_device(get_name(), std::move(address)));
 
     assert(m_i2c_device);
 

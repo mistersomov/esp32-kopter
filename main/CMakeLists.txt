@@ -18,6 +18,9 @@ set(srcdirs
         "src/pid"
         "src/sensor/barometer"
         "src/sensor/barometer/bmp280"
+        "src/sensor/imu"
+        "src/sensor/imu/filter"
+        "src/sensor/imu/mpu6050"
 )
 set(includedirs 
         "include"
@@ -37,6 +40,9 @@ set(includedirs
         "include/pid"
         "include/sensor/barometer"
         "include/sensor/barometer/bmp280"
+        "include/sensor/imu"
+        "include/sensor/imu/filter"
+        "include/sensor/imu/mpu6050"
 )
 
 idf_component_register(
