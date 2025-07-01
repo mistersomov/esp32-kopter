@@ -39,6 +39,10 @@ public:
     /**
      * @brief Constructs and initializes the PID control block with default parameters.
      *
+     * @param kp Proportional gain.
+     * @param ki Integral gain.
+     * @param kd Derivative gain.
+     *
      * This constructor creates a new instance of the ESP-IDF PID controller using
      * default tuning parameters (Kp, Ki, Kd) and sets the output limits from `0.0f` to `1.0f`.
      *
@@ -47,7 +51,7 @@ public:
      *
      * @throws PIDException if the PID control block could not be created or initialized.
      */
-    PID();
+    PID(float kp = 1.0f, float ki = 0.1f, float kd = 0.05f);
 
     /**
      * Dtor with deleting a `pid_ctrl_block_handle_t` member.

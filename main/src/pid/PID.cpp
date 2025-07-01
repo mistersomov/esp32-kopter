@@ -21,20 +21,17 @@
 
 namespace kopter {
 
-static constexpr float K_P = 1.0f;
-static constexpr float K_I = 0.1f;
-static constexpr float K_D = 0.05f;
 static constexpr float MAX_OUTPUT = 1.0f;
 static constexpr float MIN_OUTPUT = 0.0f;
 static constexpr float MAX_INTEGRAL = 1000.0f;
 static constexpr float MIN_INTEGRAL = -1000.0f;
 
-PID::PID()
+PID::PID(float kp, float ki, float kd)
 {
     pid_ctrl_parameter_t pid_runtime_param{};
-    pid_runtime_param.kp = K_P;
-    pid_runtime_param.ki = K_I;
-    pid_runtime_param.kd = K_D;
+    pid_runtime_param.kp = kp;
+    pid_runtime_param.ki = ki;
+    pid_runtime_param.kd = kd;
     pid_runtime_param.cal_type = PID_CAL_TYPE_INCREMENTAL;
     pid_runtime_param.max_output = MAX_OUTPUT;
     pid_runtime_param.min_output = MIN_OUTPUT;
