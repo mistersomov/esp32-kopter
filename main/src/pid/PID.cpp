@@ -26,7 +26,7 @@ static constexpr float MIN_OUTPUT = 0.0f;
 static constexpr float MAX_INTEGRAL = 1000.0f;
 static constexpr float MIN_INTEGRAL = -1000.0f;
 
-PID::PID(float kp, float ki, float kd)
+PID::PID(float kp, float ki, float kd, float target_point) : m_target_point{target_point}
 {
     pid_ctrl_parameter_t pid_runtime_param{};
     pid_runtime_param.kp = kp;
@@ -51,9 +51,14 @@ PID::~PID()
     }
 }
 
-void PID::update(float current_error, float &output)
+void PID::update(float current, float &output)
 {
-    check_call<PIDException>([&]() { pid_compute(m_pid, current_error, &output); });
+    check_call<PIDException>([&]() { pid_compute(m_pid, m_target_point - current, &output); });
+}
+
+void PID::set_target_point(float value) noexcept
+{
+    m_target_point = value;
 }
 
 } // namespace kopter

@@ -42,6 +42,7 @@ public:
      * @param kp Proportional gain.
      * @param ki Integral gain.
      * @param kd Derivative gain.
+     * @param target_point Target value.
      *
      * This constructor creates a new instance of the ESP-IDF PID controller using
      * default tuning parameters (Kp, Ki, Kd) and sets the output limits from `0.0f` to `1.0f`.
@@ -51,7 +52,7 @@ public:
      *
      * @throws PIDException if the PID control block could not be created or initialized.
      */
-    PID(float kp = 1.0f, float ki = 0.1f, float kd = 0.05f);
+    explicit PID(float kp = 1.0f, float ki = 0.1f, float kd = 0.05f, float target_point = 0.0f);
 
     /**
      * Dtor with deleting a `pid_ctrl_block_handle_t` member.
@@ -63,7 +64,7 @@ public:
     /**
      * @brief Updates the PID controller with the latest target and measured values.
      *
-     * @param current_error Difference between the setpoint and the current value.
+     * @param current Current value from sensor.
      * @param output Calculated the resulting output value.
      *
      * Internally, this method calculates the error, updates the PID, and applies
@@ -71,10 +72,18 @@ public:
      *
      * @throws PIDException if PID calculation has failed.
      */
-    void update(float current_error, float &output);
+    void update(float current, float &output);
+
+    /**
+     * @brief Sets the target point.
+     *
+     * @param value New target point.
+     */
+    void set_target_point(float value) noexcept;
 
 private:
     pid_ctrl_block_handle_t m_pid;
+    float m_target_point;
 };
 
 } // namespace kopter
