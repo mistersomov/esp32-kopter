@@ -22,12 +22,14 @@ using namespace idf;
 
 namespace kopter {
 
-static constexpr uint8_t SDA = 21;
-static constexpr uint8_t SCL = 22;
+#define SDA_PIN CONFIG_I2C_SDA_PIN
+#define SCL_PIN CONFIG_I2C_SCL_PIN
+
 static constexpr uint32_t FREQUENCY = 400000;
 
 I2cDeviceHolder::I2cDeviceHolder()
-    : m_master{std::make_unique<I2CMaster>(I2CNumber::I2C0(), SCL_GPIO(SCL), SDA_GPIO(SDA), Frequency(FREQUENCY))}
+    : m_master{
+          std::make_unique<I2CMaster>(I2CNumber::I2C0(), SCL_GPIO(SCL_PIN), SDA_GPIO(SDA_PIN), Frequency(FREQUENCY))}
 {
 }
 

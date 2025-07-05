@@ -25,4 +25,16 @@ menu "Kopter Conifiguration"
         help
             WiFi channel (network channel) for the example to use.
 
+    config I2C_SDA_PIN
+        int "SDA pin"
+        default 21
+        help
+            SDA pin for communicate by I2C bus
+            
+    config I2C_SCL_PIN
+        int "SCL pin"
+        default 22
+        help
+            SCL pin for communicate by I2C bus
+
 endmenu
