@@ -21,40 +21,50 @@
 
 namespace kopter {
 
-static constexpr uint32_t TIMEOUT = 0;
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
+#define ADC_GET_CHANNEL(result) ((result)->type1.channel)
+#define ADC_GET_RAW_DATA(result) ((result)->type1.data)
+#else
+#define ADC_GET_CHANNEL(result) ((result)->type2.channel)
+#define ADC_GET_RAW_DATA(result) ((result)->type2.data)
+#endif
+
+inline static constexpr uint32_t TIMEOUT = 10;
 
 ContinuousReadStrategy::ContinuousReadStrategy(adc_continuous_handle_t shared_handler,
                                                adc_cali_handle_t shared_cali_handler,
-                                               const size_t &frame_size)
+                                               size_t frame_size)
     : m_continuous_handler{shared_handler}, m_cali_handler{shared_cali_handler}, m_frame_size{frame_size}
 {
+    m_buf.resize(frame_size);
 }
 
 void ContinuousReadStrategy::read(reading_callback cb)
 {
-    std::vector<uint8_t> buf(m_frame_size);
     uint32_t out_length = 0;
 
-    ADC_CHECK_THROW(adc_continuous_read(m_continuous_handler, buf.data(), m_frame_size, &out_length, TIMEOUT));
+    check_call<ADCException>(
+        [&]() { adc_continuous_read(m_continuous_handler, m_buf.data(), m_frame_size, &out_length, TIMEOUT); });
 
     if (out_length > 0) {
         size_t sample_count = out_length / sizeof(adc_digi_output_data_t);
-        const auto *samples = reinterpret_cast<adc_digi_output_data_t *>(buf.data());
+        const auto *samples = reinterpret_cast<adc_digi_output_data_t *>(m_buf.data());
 
-        for (auto i = 0; i != sample_count; ++i) {
-            const auto channel = static_cast<adc_channel_t>(samples[i].type1.channel);
-            const auto raw_value = samples[i].type1.data;
+        for (size_t i = 0; i != sample_count; ++i) {
+            const auto channel = static_cast<adc_channel_t>(ADC_GET_CHANNEL(&samples[i]));
+            const int raw_value = ADC_GET_RAW_DATA(&samples[i]);
+            ADCSample sample{.channel = channel, .raw = raw_value};
 
             if (m_cali_handler) {
-                auto voltage = 0;
-
-                adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage);
-                cb(voltage, channel);
+                int voltage = 0;
+                check_call<ADCException>([&]() { adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage); });
+                sample.voltage = voltage;
             }
-            else {
-                cb(raw_value, channel);
-            }
+            cb(sample);
         }
+    }
+    else {
+        throw ADCException(ESP_ERR_INVALID_SIZE);
     }
 }
 

@@ -30,16 +30,17 @@ OneShotReadStrategy::OneShotReadStrategy(adc_oneshot_unit_handle_t shared_handle
 
 void OneShotReadStrategy::read(reading_callback cb)
 {
-    auto raw_value = 0;
     for (const auto &chnl : m_channels) {
-        ADC_CHECK_THROW(adc_oneshot_read(m_one_shot_handler, chnl, &raw_value));
+        int raw_value = 0;
+        check_call<ADCException>([&]() { adc_oneshot_read(m_one_shot_handler, chnl, &raw_value); });
+        ADCSample sample{.channel = chnl, .raw = raw_value};
 
         if (m_cali_handler) {
-            auto voltage = 0;
-
-            adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage);
-            cb(voltage, chnl);
+            int voltage = 0;
+            check_call<ADCException>([&]() { adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage); });
+            sample.voltage = voltage;
         }
+        cb(sample);
     }
 }
 

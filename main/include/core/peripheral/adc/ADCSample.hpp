@@ -16,20 +16,12 @@
 
 #pragma once
 
-#include "ADCSample.hpp"
-
-#include "esp_adc/adc_cali.h"
-#include "esp_adc/adc_continuous.h"
-#include "esp_adc/adc_oneshot.h"
+#include "hal/adc_types.h"
 
 namespace kopter {
-
-using reading_callback = std::function<void(const ADCSample &sample)>;
-
-struct IADCReadStrategy {
-    virtual ~IADCReadStrategy() = default;
-
-    virtual void read(reading_callback cb) = 0;
+struct ADCSample {
+    adc_channel_t channel;
+    int raw;
+    std::optional<int> voltage;
 };
-
 } // namespace kopter
