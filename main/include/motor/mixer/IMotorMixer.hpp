@@ -16,18 +16,15 @@
 
 #pragma once
 
+#include "MotorMixerConfig.hpp"
+
 namespace kopter {
 
 /**
- * @brief Interface for a motor mixer in a multirotor flight controller.
+ * @brief Abstract interface for a motor mixer in a multirotor flight controller.
  *
- * This interface defines how control inputs such as base_throttle, roll, pitch, and yaw
- * are translated into individual motor outputs. Implementations of this interface
- * can define various mixing strategies depending on the frame layout (e.g., X, +, H),
- * motor orientation, and direction of rotation.
- *
- * The mixer acts as a bridge between the flight controller and motor drivers,
- * ensuring that control signals are appropriately distributed among throttles.
+ * A motor mixer maps control signals (throttle, roll, pitch, yaw) into per-motor outputs.
+ * The output is written into a throttle array passed in via `MotorMixerConfig`.
  */
 struct IMotorMixer {
     virtual ~IMotorMixer() = default;
@@ -35,13 +32,9 @@ struct IMotorMixer {
     /**
      * @brief Apply control signals to compute per-motor throttle outputs.
      *
-     * @param throttles Array to write motor outputs to. Must be large enough for the given frame.
-     * @param base_throttle Base throttle (0.0 to 1.0).
-     * @param roll Roll command.
-     * @param pitch Pitch command.
-     * @param yaw Yaw command.
+     * @param cfg Structure containing input signals and a target buffer for motor outputs.
      */
-    virtual void mix(float *throttles, float base_throttle, float roll, float pitch, float yaw) const = 0;
+    virtual void mix(const MotorMixerConfig &cfg) const = 0;
 };
 
 } // namespace kopter

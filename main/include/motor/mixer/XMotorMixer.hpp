@@ -21,26 +21,17 @@
 namespace kopter {
 
 /**
- * @brief Mixer implementation for a quadcopter in "X" frame configuration.
+ * @brief Mixer implementation for quadcopters in the "X" configuration.
  *
- * This class implements the motor mixing logic for quadcopters arranged in an "X" frame layout.
- * It translates control signals—collective throttle, roll, pitch, and yaw—into individual motor outputs.
+ * Converts collective throttle, roll, pitch, and yaw inputs into motor throttle values for 4 motors:
  *
- * The standard "X" configuration consists of four motors:
+ *   - Motor 0: Front Left  (CW)
+ *   - Motor 1: Front Right (CCW)
+ *   - Motor 2: Rear Right  (CW)
+ *   - Motor 3: Rear Left   (CCW)
  *
- *   - Motor 0: Front Left  (CCW)
- *   - Motor 1: Front Right (CW)
- *   - Motor 2: Rear Right  (CCW)
- *   - Motor 3: Rear Left   (CW)
- *
- * Each control input affects the motor outputs as follows:
- *   - `Throttle`: equally increases all motors.
- *   - `Roll`: adjusts left/right pairs (motors on the left decrease while right increase, and vice versa).
- *   - `Pitch`: adjusts front/back pairs (front motors decrease while rear increase, and vice versa).
- *   - `Yaw`: alternates CW/CCW motors to induce rotation.
- *
- * This mixer assumes motors are indexed in the following order:
- *   ```
+ * Layout (top-down view):
+ * ```
  *        Front
  *         ^
  *         |
@@ -51,23 +42,19 @@ namespace kopter {
  *     [3]     [2]
  *         |
  *        Back
- *   ```
+ * ```
  *
- * @note Output values are written directly into the `throttles` array, which should contain at least 4 elements.
- * @note It is the caller's responsibility to clamp values to [0.0f, 1.0f] and apply actual PWM scaling.
+ * @note Throttle output values are clamped to [0.0f, 1.0f].
+ * @note Caller must ensure the `throttles` array in `MotorMixerConfig` has at least 4 elements.
  */
 struct XMotorMixer : public IMotorMixer {
 
     /**
-     * @brief Mix control inputs into motor outputs.
+     * @brief Computes motor outputs based on input control signals.
      *
-     * @param throttles Pointer to an array of at least 4 floats where the resulting motor outputs will be stored.
-     * @param base_throttle Collective throttle value, typically in [0.0, 1.0].
-     * @param roll Roll input (left/right tilt), typically in [-1.0, 1.0].
-     * @param pitch Pitch input (forward/backward tilt), typically in [-1.0, 1.0].
-     * @param yaw Yaw input (rotation), typically in [-1.0, 1.0].
+     * @param cfg Configuration containing input signals and target throttle array.
      */
-    void mix(float *throttles, float base_throttle, float roll, float pitch, float yaw) const override;
+    void mix(const MotorMixerConfig &cfg) const override;
 };
 
 } // namespace kopter

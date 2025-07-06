@@ -19,12 +19,15 @@
 
 namespace kopter {
 
-void XMotorMixer::mix(float *throttles, float base_throttle, float roll, float pitch, float yaw) const
+inline static constexpr float MIN_THROTTLE = 0.0f;
+inline static constexpr float MAX_THROTTLE = 1.0f;
+
+void XMotorMixer::mix(const MotorMixerConfig &cfg) const
 {
-    throttles[0] = std::clamp(base_throttle - roll + pitch + yaw, 0.0f, 1.0f);
-    throttles[1] = std::clamp(base_throttle + roll + pitch - yaw, 0.0f, 1.0f);
-    throttles[2] = std::clamp(base_throttle + roll - pitch + yaw, 0.0f, 1.0f);
-    throttles[3] = std::clamp(base_throttle - roll - pitch - yaw, 0.0f, 1.0f);
+    cfg.throttles[0] = std::clamp(cfg.collective_throttle - cfg.roll + cfg.pitch + cfg.yaw, MIN_THROTTLE, MAX_THROTTLE);
+    cfg.throttles[1] = std::clamp(cfg.collective_throttle + cfg.roll + cfg.pitch - cfg.yaw, MIN_THROTTLE, MAX_THROTTLE);
+    cfg.throttles[2] = std::clamp(cfg.collective_throttle + cfg.roll - cfg.pitch + cfg.yaw, MIN_THROTTLE, MAX_THROTTLE);
+    cfg.throttles[3] = std::clamp(cfg.collective_throttle - cfg.roll - cfg.pitch - cfg.yaw, MIN_THROTTLE, MAX_THROTTLE);
 }
 
 } // namespace kopter
