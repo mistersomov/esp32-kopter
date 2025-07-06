@@ -16,9 +16,9 @@
 
 #pragma once
 
+#include "I2cDevice.hpp"
 #include "IMU.hpp"
-
-#include <experimental/propagate_const>
+#include "MPU6050Mapper.hpp"
 
 namespace kopter {
 
@@ -106,8 +106,31 @@ public:
     float read_gz() const override;
 
 private:
-    class MPU6050Impl;
-    std::experimental::propagate_const<std::unique_ptr<MPU6050Impl>> m_impl;
+    /**
+     * @brief Reads raw 16-bit sensor data from the specified register.
+     *
+     * This function reads two consecutive bytes starting from the given register address
+     * over I2C and combines them into a signed 16-bit integer. This raw value is typically
+     * used for internal conversion into physical units (e.g., acceleration or rotation rate).
+     *
+     * @param reg The starting register address to read from.
+     * @return `int16_t` The raw 16-bit signed value from the sensor.
+     *
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
+     */
+    int16_t get_raw_value(uint8_t reg) const;
+
+    /**
+     * @brief Sets config for device.
+     *
+     * Resets the device and disables sleep mode. Also sets the default sensitivity for the accelerometer and gyroscope.
+     *
+     * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
+     */
+    void set_config();
+
+    std::unique_ptr<I2cDevice> m_i2c_device;
+    std::unique_ptr<MPU6050Mapper> m_mapper;
 };
 
 } // namespace kopter
