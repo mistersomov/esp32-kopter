@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "BMP280Mapper.hpp"
+#include "I2cDevice.hpp"
 #include "IBarometer.hpp"
 
 namespace kopter {
@@ -46,7 +48,7 @@ public:
     /**
      * @brief Dtor for the BMP280 object.
      */
-    ~BMP280();
+    ~BMP280() override = default;
 
     /**
      * @brief Returns the name `"[BMP280]"`.
@@ -80,8 +82,13 @@ public:
     float read_altitude() override;
 
 private:
-    class Impl;
-    std::unique_ptr<Impl> m_impl;
+    void set_ctrl_meas();
+    void set_config();
+    void set_calib_data();
+
+    std::unique_ptr<I2cDevice> m_i2c_device;
+    std::unique_ptr<BMP280Mapper> m_mapper;
+    std::unique_ptr<BMP280Calibration> m_calib;
 };
 
 } // namespace kopter

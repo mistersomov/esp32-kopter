@@ -25,23 +25,28 @@ namespace kopter {
  */
 class BMP280Mapper {
 public:
+    /**
+     * @brief Ctor for a BMP280 Mapper.
+     */
     BMP280Mapper();
 
     /**
      * @brief Maps the raw temperature value.
      *
      * @param raw 32-bit signed raw value from the sensor.
+     * @param calib Pointer to the BMP280 calibration data.
      * @return Transformed temperature in degrees Celsius.
      */
-    float map_temperature(int32_t raw, BMP280Calibration &calib);
+    float map_temperature(int32_t raw, BMP280Calibration *calib);
 
     /**
      * @brief Maps the raw pressure value.
      *
      * @param raw 32-bit unsigned raw value from the sensor.
+     * @param calib Pointer to the BMP280 calibration data.
      * @return Transformed pressure in Pascals (Pa).
      */
-    float map_pressure(uint32_t raw, BMP280Calibration &calib);
+    float map_pressure(uint32_t raw, BMP280Calibration *calib);
 
     /**
      * @brief Maps the calculated pressure value into altitude.
@@ -59,10 +64,10 @@ private:
      * and stores an intermediate fine temperature value used for pressure calculation.
      *
      * @param adc_t Raw temperature value from the BMP280 sensor (signed 32-bit integer).
-     * @param calib Reference to the BMP280 calibration data.
+     * @param calib Pointer to the BMP280 calibration data.
      * @return Compensated temperature in degrees Celsius.
      */
-    float get_compensated_temperature(int32_t adc_t, BMP280Calibration &calib);
+    float get_compensated_temperature(int32_t adc_t, BMP280Calibration *calib);
 
     /**
      * @brief Compensates the raw pressure reading using the calibration data.
@@ -72,10 +77,10 @@ private:
      * from the last temperature compensation.
      *
      * @param adc_p Raw pressure value from the BMP280 sensor (unsigned 32-bit integer).
-     * @param calib Reference to the BMP280 calibration data.
+     * @param calib Pointer to the BMP280 calibration data.
      * @return Compensated pressure in Pascals (Pa).
      */
-    float get_compensated_pressure(uint32_t adc_p, BMP280Calibration &calib);
+    float get_compensated_pressure(uint32_t adc_p, BMP280Calibration *calib);
 
     /**
      * @brief Intermediate temperature value used in pressure compensation.

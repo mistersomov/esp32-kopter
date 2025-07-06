@@ -20,21 +20,21 @@
 
 namespace kopter {
 
-static constexpr float SEA_LEVEL_PRESSURE = 101325.0f;
-static constexpr float ALTITUDE_SCALE = 44330.0f;
-static constexpr float ALTITUDE_EXPONENT = 0.1903f;
-static constexpr float HPA2PA = 256.0f * 100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
+inline static constexpr float SEA_LEVEL_PRESSURE = 101325.0f;
+inline static constexpr float ALTITUDE_SCALE = 44330.0f;
+inline static constexpr float ALTITUDE_EXPONENT = 0.1903f;
+inline static constexpr float HPA2PA = 256.0f * 100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
 
 BMP280Mapper::BMP280Mapper() : m_t_fine{0}
 {
 }
 
-float BMP280Mapper::map_temperature(int32_t raw, BMP280Calibration &calib)
+float BMP280Mapper::map_temperature(int32_t raw, BMP280Calibration *calib)
 {
     return get_compensated_temperature(raw, calib);
 }
 
-float BMP280Mapper::map_pressure(uint32_t raw, BMP280Calibration &calib)
+float BMP280Mapper::map_pressure(uint32_t raw, BMP280Calibration *calib)
 {
     return get_compensated_pressure(raw, calib);
 }
@@ -44,13 +44,13 @@ float BMP280Mapper::map_altitude(float pressure)
     return ALTITUDE_SCALE * (1.0f - std::pow(pressure / SEA_LEVEL_PRESSURE, ALTITUDE_EXPONENT));
 }
 
-float BMP280Mapper::get_compensated_temperature(int32_t adc_t, BMP280Calibration &calib)
+float BMP280Mapper::get_compensated_temperature(int32_t adc_t, BMP280Calibration *calib)
 {
     const int32_t adc_t_shifted_3 = static_cast<int32_t>(adc_t >> 3);
     const int32_t adc_t_shifted_4 = static_cast<int32_t>(adc_t >> 4);
-    const int32_t dig_T1 = static_cast<int32_t>(calib.dig_T1);
-    const int32_t dig_T2 = static_cast<int32_t>(calib.dig_T2);
-    const int32_t dig_T3 = static_cast<int32_t>(calib.dig_T3);
+    const int32_t dig_T1 = static_cast<int32_t>(calib->dig_T1);
+    const int32_t dig_T2 = static_cast<int32_t>(calib->dig_P1);
+    const int32_t dig_T3 = static_cast<int32_t>(calib->dig_T3);
 
     const int32_t delta_3 = adc_t_shifted_3 - (dig_T1 << 1);
     const int32_t delta_4 = adc_t_shifted_4 - dig_T1;
@@ -63,17 +63,17 @@ float BMP280Mapper::get_compensated_temperature(int32_t adc_t, BMP280Calibration
     return static_cast<float>((m_t_fine * 5 + 128) >> 8) / 100.0f;
 }
 
-float BMP280Mapper::get_compensated_pressure(uint32_t adc_p, BMP280Calibration &calib)
+float BMP280Mapper::get_compensated_pressure(uint32_t adc_p, BMP280Calibration *calib)
 {
-    const int64_t dig_P1 = static_cast<int64_t>(calib.dig_P1);
-    const int64_t dig_P2 = static_cast<int64_t>(calib.dig_P2);
-    const int64_t dig_P3 = static_cast<int64_t>(calib.dig_P3);
-    const int64_t dig_P4 = static_cast<int64_t>(calib.dig_P4);
-    const int64_t dig_P5 = static_cast<int64_t>(calib.dig_P5);
-    const int64_t dig_P6 = static_cast<int64_t>(calib.dig_P6);
-    const int64_t dig_P7 = static_cast<int64_t>(calib.dig_P7);
-    const int64_t dig_P8 = static_cast<int64_t>(calib.dig_P8);
-    const int64_t dig_P9 = static_cast<int64_t>(calib.dig_P9);
+    const int64_t dig_P1 = static_cast<int64_t>(calib->dig_P1);
+    const int64_t dig_P2 = static_cast<int64_t>(calib->dig_P2);
+    const int64_t dig_P3 = static_cast<int64_t>(calib->dig_P3);
+    const int64_t dig_P4 = static_cast<int64_t>(calib->dig_P4);
+    const int64_t dig_P5 = static_cast<int64_t>(calib->dig_P5);
+    const int64_t dig_P6 = static_cast<int64_t>(calib->dig_P6);
+    const int64_t dig_P7 = static_cast<int64_t>(calib->dig_P7);
+    const int64_t dig_P8 = static_cast<int64_t>(calib->dig_P8);
+    const int64_t dig_P9 = static_cast<int64_t>(calib->dig_P9);
 
     int64_t var1 = static_cast<int64_t>(m_t_fine) - 128000;
     int64_t var2 = var1 * var1 * dig_P6;
