@@ -24,7 +24,7 @@ namespace kopter {
 
 #define MSG_CHECK_THROW(err) CHECK_THROW_WITH(err, MessageException)
 
-#define WIFI_CHANNEL CONFIG_AP_WIFI_CHANNEL
+#define WIFI_CHANNEL CONFIG_WIFI_AP_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP
 #define ESPNOW_WIFI_IF WIFI_IF_AP
 #else

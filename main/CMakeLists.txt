@@ -46,7 +46,7 @@ set(includedirs
 idf_component_register(
     SRC_DIRS ${srcdirs}
     INCLUDE_DIRS ${includedirs}
-    PRIV_REQUIRES esp_event esp_wifi nvs_flash esp_adc glm
+    PRIV_REQUIRES esp_event esp_wifi nvs_flash esp_netif esp_adc glm
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -std=c++20 -fexceptions)
