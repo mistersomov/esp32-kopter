@@ -28,6 +28,13 @@ namespace kopter {
 
 #define ATTENUATION ADC_ATTEN_DB_12
 #define BITWIDTH ADC_BITWIDTH_12
+#if CONFIG_IDF_TARGET_ESP32C6 || CONFIG_IDF_TARGET_ESP32H2 || CONFIG_IDF_TARGET_ESP32C5
+#define CONV_MODE ADC_CONV_BOTH_UNIT
+#define OUTPUT_FORMAT_TYPE ADC_DIGI_OUTPUT_FORMAT_TYPE2
+#else
+#define CONV_MODE ADC_CONV_SINGLE_UNIT_1
+#define OUTPUT_FORMAT_TYPE ADC_DIGI_OUTPUT_FORMAT_TYPE1
+#endif
 
 static constexpr uint16_t SAMPLE_FREQUENCY = 20000;
 static constexpr uint16_t MAX_STORE_BUF_SIZE = 1024;
@@ -178,8 +185,8 @@ void ADCDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel
     adc_continuous_config_t dig_cfg{};
     dig_cfg.pattern_num = channels.size();
     dig_cfg.sample_freq_hz = SAMPLE_FREQUENCY;
-    dig_cfg.conv_mode = ADC_CONV_SINGLE_UNIT_1;
-    dig_cfg.format = ADC_DIGI_OUTPUT_FORMAT_TYPE1;
+    dig_cfg.conv_mode = CONV_MODE;
+    dig_cfg.format = OUTPUT_FORMAT_TYPE;
 
     std::vector<adc_digi_pattern_config_t> digi_pattern_cfgs;
     digi_pattern_cfgs.reserve(channels.size());
