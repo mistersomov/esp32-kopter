@@ -14,39 +14,10 @@
  limitations under the License.
  */
 
-#ifndef WIFI_MANAGER_HPP
-#define WIFI_MANAGER_HPP
-
-namespace idf::event {
-
-class ESPEventReg;
-
-} // namespace idf::event
+#pragma once
 
 namespace kopter {
-
-class LoopManager;
-
 struct WiFiException : public KopterException {
     WiFiException(esp_err_t error);
 };
-
-class WiFiManager {
-public:
-    WiFiManager(const WiFiManager &) = delete;
-    WiFiManager &operator=(const WiFiManager &) = delete;
-    ~WiFiManager();
-
-    static WiFiManager &get_instance(LoopManager *p_loop_manager);
-
-private:
-    WiFiManager();
-
-    void set_wifi_config();
-
-    LoopManager *m_loop_manager{nullptr};
-};
-
 } // namespace kopter
-
-#endif
