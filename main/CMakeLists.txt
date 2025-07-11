@@ -6,6 +6,7 @@ endif()
 
 set(srcdirs 
         "src"
+        "src/core/firmware"
         "src/core/network"
         "src/core/peripheral/adc"
         "src/core/peripheral/i2c"
@@ -25,6 +26,7 @@ set(includedirs
         "include"
         "include/core"
         "include/core/exception"
+        "include/core/firmware"
         "include/core/network"
         "include/core/peripheral"
         "include/core/peripheral/adc"
