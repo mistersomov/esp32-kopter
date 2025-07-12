@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "nvs_handle.hpp"
+
 namespace kopter {
 
 /**
@@ -67,6 +69,8 @@ public:
 
 private:
     FirmwareService();
+
+    std::unique_ptr<nvs::NVSHandle> open_nvs();
 };
 
 } // namespace kopter

@@ -19,8 +19,9 @@
 
 #include "FirmwareException.hpp"
 
-#include "nvs.h"
 #include "nvs_flash.h"
+
+using namespace nvs;
 
 namespace kopter {
 
@@ -46,31 +47,49 @@ FirmwareService &FirmwareService::get_instance()
 
 uint16_t FirmwareService::get_version()
 {
-    nvs_handle_t handler;
-    check_call<FirmwareException>([&handler]() { nvs_open(STORAGE_NAME.data(), NVS_READWRITE, &handler); });
-
-    uint16_t version;
-    esp_err_t ret = nvs_get_u16(handler, VERSION_KEY.data(), &version);
-    if (ret != ESP_OK) {
-        check_call<FirmwareException>([&handler]() { nvs_close(handler); });
-        set_version(DEFAULT_VERSION);
-
+    auto handler = open_nvs();
+    if (handler == nullptr) {
         return DEFAULT_VERSION;
     }
-    check_call<FirmwareException>([&handler]() { nvs_close(handler); });
+
+    uint16_t version;
+    if (handler->get_item<uint16_t>(VERSION_KEY.data(), version) != ESP_OK) {
+        set_version(DEFAULT_VERSION);
+    }
 
     return version;
 }
 
 void FirmwareService::set_version(const uint16_t new_version)
 {
-    nvs_handle_t handler;
+    auto handler = open_nvs();
+    if (handler == nullptr) {
+        return;
+    }
+    if (handler->set_item<uint16_t>(VERSION_KEY.data(), new_version) != ESP_OK) {
+        ESP_LOGE(TAG.data(), "Failed to save new version");
+        return;
+    }
+    if (handler->commit() != ESP_OK) {
+        ESP_LOGE(TAG.data(), "Failed to commit changes");
+        return;
+    }
+}
 
-    check_call<FirmwareException>([&handler]() { nvs_open(STORAGE_NAME.data(), NVS_READWRITE, &handler); });
-    check_call<FirmwareException>(
-        [&handler, &new_version]() { nvs_set_u16(handler, VERSION_KEY.data(), new_version); });
-    check_call<FirmwareException>([&handler]() { nvs_commit(handler); });
-    check_call<FirmwareException>([&handler]() { nvs_close(handler); });
+std::unique_ptr<nvs::NVSHandle> FirmwareService::open_nvs()
+{
+    esp_err_t ret;
+    auto handler = open_nvs_handle(STORAGE_NAME.data(), NVS_READWRITE, &ret);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG.data(),
+                 "Failed to open NVS storage \"%s\" in %s mode (err: 0x%X - %s)",
+                 STORAGE_NAME.data(),
+                 "READWRITE",
+                 ret,
+                 esp_err_to_name(ret));
+        return nullptr;
+    }
+    return handler;
 }
 
 } // namespace kopter
