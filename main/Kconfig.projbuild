@@ -79,6 +79,28 @@ menu "Kopter Conifiguration"
         endchoice
     endmenu
 
+    menu "OTA Configuration"
+        comment "OTA Configuration"
+        
+        config OTA_ENABLED
+            bool "Enable OTA update"
+            default "y"
+        
+        config FIRMWARE_URL
+            depends on OTA_ENABLED
+            string "Firmware Upgrade URL"
+            help
+                URL of server which hosts the firmware image.
+
+        config OTA_RECV_TIMEOUT
+            depends on OTA_ENABLED
+            int "OTA Receive Timeout"
+            default 5000
+            help
+                Maximum time for reception
+
+    endmenu
+
     config ENABLE_LONG_RANGE
         bool "Enable Long Range"
         default "n"

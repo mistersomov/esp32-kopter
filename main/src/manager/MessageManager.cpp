@@ -41,6 +41,7 @@ static uint8_t dest_mac[ESP_NOW_ETH_ALEN] = {0xc8, 0xf0, 0x9e, 0xb2, 0x36, 0xfd}
 
 static constexpr uint8_t MESSAGE_QUEUE_SIZE = 6;
 static constexpr std::string_view RECV_MESSAGE_TASK_NAME = "msg_task";
+static constexpr uint16_t RECV_MESSAGE_TASK_STACK_SIZE = 4096;
 static constexpr std::string_view TAG = "[MessageManager]";
 
 MessageException::MessageException(esp_err_t error) : KopterException(error)
@@ -143,7 +144,7 @@ esp_err_t MessageManager::add_peer_to_list() const
 
 void MessageManager::create_msg_receive_task()
 {
-    m_recv_task = new Task(RECV_MESSAGE_TASK_NAME.data(), [this]() {
+    m_recv_task = new Task(RECV_MESSAGE_TASK_NAME.data(), RECV_MESSAGE_TASK_STACK_SIZE, [this]() {
         Message *msg;
 
         while (true) {

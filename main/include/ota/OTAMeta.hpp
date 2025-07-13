@@ -17,17 +17,8 @@
 #pragma once
 
 namespace kopter {
-
-class Task {
-public:
-    using TaskFn = std::function<void()>;
-
-    Task(const char *task_name, uint32_t stack_size, TaskFn fn);
-    Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, BaseType_t coreId, TaskFn fn);
-
-private:
-    static void task_trampoline(void *param);
-    TaskFn m_fn;
+struct OTAMeta {
+    std::string url;
+    uint16_t version;
 };
-
 } // namespace kopter
