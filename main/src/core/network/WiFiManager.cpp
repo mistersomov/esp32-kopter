@@ -148,7 +148,7 @@ void WiFiManager::sta_do_connect()
 
 void WiFiManager::sta_do_reconnect()
 {
-    if (++m_retry_count > MAXIMUM_RETRY) {
+    if (m_retry_count > MAXIMUM_RETRY) {
         ESP_LOGE(TAG.data(), "WiFi Connect failed %d times, stop reconnect.", m_retry_count);
         sta_do_disconnect();
         return;
