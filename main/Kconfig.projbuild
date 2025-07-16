@@ -34,13 +34,13 @@ menu "Kopter Conifiguration"
 
         config WIFI_REMOTE_AP_SSID
             string "WiFi Remote AP SSID"
-            default "otherapssid"
+            default ""
             help
                 SSID (network name) to connect to.
 
         config WIFI_REMOTE_AP_PASSWORD
             string "WiFi Remote AP Password"
-            default "otherappassword"
+            default ""
             help
                 WiFi password.
 
