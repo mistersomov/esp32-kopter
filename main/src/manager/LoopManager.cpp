@@ -17,9 +17,6 @@
 #include "pch.hpp"
 #include "LoopManager.hpp"
 
-#include "esp_event_api.hpp"
-#include "esp_event_cxx.hpp"
-
 using namespace idf::event;
 
 constexpr uint16_t QUEUE_SIZE = 64;
@@ -60,6 +57,11 @@ std::unique_ptr<idf::event::ESPEventReg> LoopManager::register_event(
 {
     std::unique_ptr<ESPEventReg> system_event = m_custom_loop->register_event(event, cb);
     return system_event;
+}
+
+void LoopManager::post_event(const idf::event::ESPEvent &event)
+{
+    m_custom_loop->post_event_data(event);
 }
 
 } // namespace kopter
