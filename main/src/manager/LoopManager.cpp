@@ -55,4 +55,11 @@ std::unique_ptr<ESPEventReg> LoopManager::register_system_event(const ESPEvent &
     return system_event;
 }
 
+std::unique_ptr<idf::event::ESPEventReg> LoopManager::register_event(
+    const idf::event::ESPEvent &event, std::function<void(const idf::event::ESPEvent &, void *)> cb)
+{
+    std::unique_ptr<ESPEventReg> system_event = m_custom_loop->register_event(event, cb);
+    return system_event;
+}
+
 } // namespace kopter

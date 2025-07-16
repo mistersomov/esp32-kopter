@@ -49,8 +49,10 @@ public:
     }
 
     std::unique_ptr<idf::event::ESPEventReg> register_system_event(
-        const idf::event::ESPEvent &event, std::function<void(const idf::event::ESPEvent &, void *)> cb
-    );
+        const idf::event::ESPEvent &event, std::function<void(const idf::event::ESPEvent &, void *)> cb);
+
+    std::unique_ptr<idf::event::ESPEventReg> register_event(
+        const idf::event::ESPEvent &event, std::function<void(const idf::event::ESPEvent &, void *)> cb);
 
 private:
     LoopManager();
