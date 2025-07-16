@@ -14,8 +14,7 @@
  limitations under the License.
  */
 
-#ifndef LOOP_MANAGER_HPP
-#define LOOP_MANAGER_HPP
+#pragma once
 
 namespace idf::event {
 
@@ -63,5 +62,3 @@ private:
 };
 
 } // namespace kopter
-
-#endif
