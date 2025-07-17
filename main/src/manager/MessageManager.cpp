@@ -39,10 +39,12 @@ static uint8_t dest_mac[ESP_NOW_ETH_ALEN] = {0xc8, 0xf0, 0x9e, 0xb2, 0x36, 0xfd}
 #endif
 // Customize region end
 
-static constexpr uint8_t MESSAGE_QUEUE_SIZE = 6;
-static constexpr std::string_view RECV_MESSAGE_TASK_NAME = "msg_task";
-static constexpr uint16_t RECV_MESSAGE_TASK_STACK_SIZE = 4096;
-static constexpr std::string_view TAG = "[MessageManager]";
+namespace {
+constexpr uint8_t MESSAGE_QUEUE_SIZE = 6;
+constexpr std::string_view RECV_MESSAGE_TASK_NAME = "msg_task";
+constexpr uint16_t RECV_MESSAGE_TASK_STACK_SIZE = 4096;
+constexpr std::string_view TAG = "[MessageManager]";
+} // namespace
 
 MessageException::MessageException(esp_err_t error) : KopterException(error)
 {

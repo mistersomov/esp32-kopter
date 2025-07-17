@@ -20,10 +20,12 @@
 
 namespace kopter {
 
-inline static constexpr float SEA_LEVEL_PRESSURE = 101325.0f;
-inline static constexpr float ALTITUDE_SCALE = 44330.0f;
-inline static constexpr float ALTITUDE_EXPONENT = 0.1903f;
-inline static constexpr float HPA2PA = 256.0f * 100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
+namespace {
+constexpr float SEA_LEVEL_PRESSURE = 101325.0f;
+constexpr float ALTITUDE_SCALE = 44330.0f;
+constexpr float ALTITUDE_EXPONENT = 0.1903f;
+constexpr float HPA2PA = 256.0f * 100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
+} // namespace
 
 BMP280Mapper::BMP280Mapper() : m_t_fine{0}
 {

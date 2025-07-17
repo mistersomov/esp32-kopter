@@ -39,8 +39,10 @@ namespace kopter {
 #define MAXIMUM_RETRY CONFIG_MAXIMUM_STA_RETRY
 #define LONG_RANGE CONFIG_ENABLE_LONG_RANGE
 
-inline static constexpr uint8_t RECONNECT_DELAY = 1000;
-inline static constexpr std::string_view TAG = "[WiFiManager]";
+namespace {
+constexpr uint16_t RECONNECT_DELAY = 1000;
+constexpr std::string_view TAG = "[WiFiManager]";
+} // namespace
 
 WiFiManager::WiFiManager(LoopManager *p_loop_manager) : m_loop_manager{p_loop_manager}, m_retry_count{0}
 {

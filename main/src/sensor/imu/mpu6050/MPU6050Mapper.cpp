@@ -19,14 +19,16 @@
 
 namespace kopter {
 
-static constexpr float AFS_SEL_0 = 16384.0f;
-static constexpr float AFS_SEL_1 = 8192.0f;
-static constexpr float AFS_SEL_2 = 4096.0f;
-static constexpr float AFS_SEL_3 = 2048.0f;
-static constexpr float GFS_SEL_0 = 131.0f;
-static constexpr float GFS_SEL_1 = 65.5f;
-static constexpr float GFS_SEL_2 = 32.8f;
-static constexpr float GFS_SEL_3 = 16.4f;
+namespace {
+constexpr float AFS_SEL_0 = 16384.0f;
+constexpr float AFS_SEL_1 = 8192.0f;
+constexpr float AFS_SEL_2 = 4096.0f;
+constexpr float AFS_SEL_3 = 2048.0f;
+constexpr float GFS_SEL_0 = 131.0f;
+constexpr float GFS_SEL_1 = 65.5f;
+constexpr float GFS_SEL_2 = 32.8f;
+constexpr float GFS_SEL_3 = 16.4f;
+} // namespace
 
 MPU6050Mapper::MPU6050Mapper(AccelSensitivityMode ax_mode,
                              AccelSensitivityMode ay_mode,

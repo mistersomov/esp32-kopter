@@ -25,7 +25,9 @@ namespace kopter {
 #define SDA_PIN CONFIG_I2C_SDA_PIN
 #define SCL_PIN CONFIG_I2C_SCL_PIN
 
-static constexpr uint32_t FREQUENCY = 400000;
+namespace {
+constexpr uint32_t FREQUENCY = 400000;
+} // namespace
 
 I2cDeviceHolder::I2cDeviceHolder()
     : m_master{

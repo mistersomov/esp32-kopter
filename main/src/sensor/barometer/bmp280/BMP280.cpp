@@ -22,14 +22,16 @@
 
 namespace kopter {
 
-inline static constexpr uint8_t CTRL_MEAS_REG = 0xF4;
-inline static constexpr uint8_t CONFIG_REG = 0xF5;
-inline static constexpr uint8_t TEMP_UPPER_BYTE = 0xFA;
-inline static constexpr uint8_t PRESSURE_UPPER_BYTE = 0xF7;
-inline static constexpr uint8_t CALIB_UPPER_BYTE = 0x88;
-inline static constexpr uint8_t TEMP_BYTES = 3;
-inline static constexpr uint8_t PRESSURE_BYTES = 3;
-inline static constexpr uint8_t CALIB_BYTES = 24;
+namespace {
+constexpr uint8_t CTRL_MEAS_REG = 0xF4;
+constexpr uint8_t CONFIG_REG = 0xF5;
+constexpr uint8_t TEMP_UPPER_BYTE = 0xFA;
+constexpr uint8_t PRESSURE_UPPER_BYTE = 0xF7;
+constexpr uint8_t CALIB_UPPER_BYTE = 0x88;
+constexpr uint8_t TEMP_BYTES = 3;
+constexpr uint8_t PRESSURE_BYTES = 3;
+constexpr uint8_t CALIB_BYTES = 24;
+} // namespace
 
 BMP280::BMP280(uint8_t address)
     : IBarometer(), m_mapper{std::make_unique<BMP280Mapper>()}, m_calib{std::make_unique<BMP280Calibration>()}

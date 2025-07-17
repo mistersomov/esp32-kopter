@@ -21,9 +21,11 @@
 
 namespace kopter {
 
-static constexpr float MS2SEC = 1e6f;
-static constexpr float DEG2RAD = glm::pi<float>() / 180.0f;
-static constexpr float MIN_ANGLE = 1e-6f;
+namespace {
+constexpr float MS2SEC = 1e6f;
+constexpr float DEG2RAD = glm::pi<float>() / 180.0f;
+constexpr float MIN_ANGLE = 1e-6f;
+} // namespace
 
 ComplementaryFilter::ComplementaryFilter(float alpha) noexcept
     : m_alpha{alpha}, m_last_timestamp{0}, m_quat{glm::vec3(0.0f)}

@@ -19,8 +19,10 @@
 
 namespace kopter {
 
-inline static constexpr float MIN_THROTTLE = 0.0f;
-inline static constexpr float MAX_THROTTLE = 1.0f;
+namespace {
+constexpr float MIN_THROTTLE = 0.0f;
+constexpr float MAX_THROTTLE = 1.0f;
+} // namespace
 
 void XMotorMixer::mix(const MotorMixerConfig &cfg) const
 {

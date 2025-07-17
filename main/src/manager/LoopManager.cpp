@@ -19,13 +19,15 @@
 
 using namespace idf::event;
 
+namespace kopter {
+
+namespace {
 constexpr uint16_t QUEUE_SIZE = 64;
 constexpr std::string_view TASK_NAME = "event_task";
 constexpr uint16_t TASK_PRIORITY = 5;
 constexpr uint32_t TASK_STACK_SIZE = 4096;
 constexpr uint16_t CORE_ID = 0;
-
-namespace kopter {
+} // namespace
 
 static esp_event_loop_args_t make_loop_args()
 {

@@ -30,10 +30,12 @@ namespace kopter {
 #define FIRMWARE_URL CONFIG_FIRMWARE_URL
 #define RECV_TIMEOUT CONFIG_OTA_RECV_TIMEOUT
 
-inline static constexpr uint16_t BUFFER_SIZE = 4096;
-inline static constexpr std::string_view TASK_NAME = "perform_update";
-inline static constexpr uint16_t TASK_STACK_SIZE = 8192;
-inline static constexpr std::string_view TAG = "[OTAService]";
+namespace {
+constexpr uint16_t BUFFER_SIZE = 4096;
+constexpr std::string_view TASK_NAME = "perform_update";
+constexpr uint16_t TASK_STACK_SIZE = 8192;
+constexpr std::string_view TAG = "[OTAService]";
+} // namespace
 
 OTAService::OTAService() noexcept : m_meta_info{}
 {

@@ -29,7 +29,9 @@ namespace kopter {
 #define ADC_GET_RAW_DATA(result) ((result)->type2.data)
 #endif
 
-inline static constexpr uint32_t TIMEOUT = 10;
+namespace {
+constexpr uint32_t TIMEOUT = 10;
+} // namespace
 
 ContinuousReadStrategy::ContinuousReadStrategy(adc_continuous_handle_t shared_handler,
                                                adc_cali_handle_t shared_cali_handler,

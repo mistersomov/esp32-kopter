@@ -25,10 +25,12 @@ using namespace nvs;
 
 namespace kopter {
 
-inline static constexpr uint16_t DEFAULT_VERSION = 1;
-inline static constexpr std::string_view STORAGE_NAME = "storage";
-inline static constexpr std::string_view VERSION_KEY = "version";
-inline static constexpr std::string_view TAG = "[FirmwareService]";
+namespace {
+constexpr uint16_t DEFAULT_VERSION = 1;
+constexpr std::string_view STORAGE_NAME = "storage";
+constexpr std::string_view VERSION_KEY = "version";
+constexpr std::string_view TAG = "[FirmwareService]";
+} // namespace
 
 FirmwareService::FirmwareService()
 {

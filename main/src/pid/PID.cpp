@@ -21,10 +21,12 @@
 
 namespace kopter {
 
-static constexpr float MAX_OUTPUT = 1.0f;
-static constexpr float MIN_OUTPUT = 0.0f;
-static constexpr float MAX_INTEGRAL = 1000.0f;
-static constexpr float MIN_INTEGRAL = -1000.0f;
+namespace {
+constexpr float MAX_OUTPUT = 100.0f;
+constexpr float MIN_OUTPUT = 0.0f;
+constexpr float MAX_INTEGRAL = 1000.0f;
+constexpr float MIN_INTEGRAL = -1000.0f;
+} // namespace
 
 PID::PID(float kp, float ki, float kd, float target_point) : m_target_point{target_point}
 {

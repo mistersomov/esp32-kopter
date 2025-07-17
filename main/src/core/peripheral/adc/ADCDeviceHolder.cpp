@@ -36,10 +36,12 @@ namespace kopter {
 #define OUTPUT_FORMAT_TYPE ADC_DIGI_OUTPUT_FORMAT_TYPE1
 #endif
 
-static constexpr uint16_t SAMPLE_FREQUENCY = 20000;
-static constexpr uint16_t MAX_STORE_BUF_SIZE = 1024;
-static constexpr uint8_t CONV_FRAME_SIZE = 32;
-static constexpr std::string_view TAG = "[ADCDeviceHolder]";
+namespace {
+constexpr uint16_t SAMPLE_FREQUENCY = 20000;
+constexpr uint16_t MAX_STORE_BUF_SIZE = 1024;
+constexpr uint8_t CONV_FRAME_SIZE = 32;
+constexpr std::string_view TAG = "[ADCDeviceHolder]";
+} // namespace
 
 ADCDeviceHolder::ADCDeviceHolder()
 {

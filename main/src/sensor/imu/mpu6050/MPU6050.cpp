@@ -21,21 +21,23 @@
 
 namespace kopter {
 
-inline static constexpr uint8_t POWER_MGT_REG = 0x6B;
-inline static constexpr uint8_t DEVICE_RESET = 0x01;
-inline static constexpr uint8_t SLEEP_MODE = 0x00;
-inline static constexpr uint8_t ACCEL_CONFIG_REG = 0x1C;
-inline static constexpr uint8_t GYRO_CONFIG_REG = 0x1B;
-inline static constexpr uint8_t ACCEL_2G = 0x00;
-inline static constexpr uint8_t GYRO_250DPS = 0x00;
-inline static constexpr uint8_t REG_AX_H = 0x3B;
-inline static constexpr uint8_t REG_AY_H = 0x3D;
-inline static constexpr uint8_t REG_AZ_H = 0x3F;
-inline static constexpr uint8_t REG_GX_H = 0x43;
-inline static constexpr uint8_t REG_GY_H = 0x45;
-inline static constexpr uint8_t REG_GZ_H = 0x47;
-inline static constexpr uint8_t BYTES_PER_AXIS = 2;
-inline static constexpr uint8_t DELAY_MS = 100;
+namespace {
+constexpr uint8_t POWER_MGT_REG = 0x6B;
+constexpr uint8_t DEVICE_RESET = 0x01;
+constexpr uint8_t SLEEP_MODE = 0x00;
+constexpr uint8_t ACCEL_CONFIG_REG = 0x1C;
+constexpr uint8_t GYRO_CONFIG_REG = 0x1B;
+constexpr uint8_t ACCEL_2G = 0x00;
+constexpr uint8_t GYRO_250DPS = 0x00;
+constexpr uint8_t REG_AX_H = 0x3B;
+constexpr uint8_t REG_AY_H = 0x3D;
+constexpr uint8_t REG_AZ_H = 0x3F;
+constexpr uint8_t REG_GX_H = 0x43;
+constexpr uint8_t REG_GY_H = 0x45;
+constexpr uint8_t REG_GZ_H = 0x47;
+constexpr uint8_t BYTES_PER_AXIS = 2;
+constexpr uint8_t DELAY_MS = 100;
+} // namespace
 
 MPU6050::MPU6050(uint8_t address) : IMU(), m_mapper{std::make_unique<MPU6050Mapper>()}
 {

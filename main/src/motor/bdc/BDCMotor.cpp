@@ -22,12 +22,13 @@
 
 namespace kopter {
 
-inline static constexpr uint8_t MCPWM_GROUP_ID_0 = 0;
-inline static constexpr uint8_t MCPWM_GROUP_ID_1 = 1;
-inline static constexpr uint32_t MCPWM_FREQ_HZ = 5000;
-inline static constexpr uint32_t MCPWM_TIMER_RESOLUTION_HZ = 1000000;
-inline static constexpr uint32_t MCPWM_DUTY_TICK_MAX =
+namespace {
+constexpr uint8_t MCPWM_GROUP_ID_0 = 0;
+constexpr uint32_t MCPWM_FREQ_HZ = 5000;
+constexpr uint32_t MCPWM_TIMER_RESOLUTION_HZ = 1000000;
+constexpr uint32_t MCPWM_DUTY_TICK_MAX =
     MCPWM_TIMER_RESOLUTION_HZ / MCPWM_FREQ_HZ; // maximum value we can set for the duty cycle, in ticks
+} // namespace
 
 BDCMotor::BDCMotor(gpio_num_t gpio) : IMotor()
 {
