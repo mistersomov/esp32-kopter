@@ -1,8 +1,9 @@
 ## IDF Component Manager Manifest File
 dependencies:
-  espressif/pid_ctrl: "^0.1.1"
-  espressif/bdc_motor: "^0.1.0"
-  espressif/esp-idf-cxx: 
+  led_strip: "^3.0.1~1"
+  pid_ctrl: "^0.1.1"
+  bdc_motor: "^0.1.0"
+  esp-idf-cxx: 
     version: "^1.0.0"
     pre_release: true
   ## Required IDF version
