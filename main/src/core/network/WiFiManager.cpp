@@ -46,18 +46,6 @@ constexpr std::string_view TAG = "[WiFiManager]";
 
 WiFiManager::WiFiManager(LoopManager *p_loop_manager) : m_loop_manager{p_loop_manager}, m_retry_count{0}
 {
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        check_call<WiFiException>([]() { nvs_flash_erase(); });
-        check_call<WiFiException>([]() { nvs_flash_init(); });
-    }
-
-    check_call<WiFiException>([]() { esp_netif_init(); });
-
-    set_event_handler();
-    set_wifi_config();
-    check_call<WiFiException>([]() { esp_wifi_set_storage(WIFI_STORAGE_RAM); });
-    check_call<WiFiException>([]() { esp_wifi_start(); });
 }
 
 WiFiManager::~WiFiManager()
@@ -83,6 +71,22 @@ WiFiManager &WiFiManager::get_instance(LoopManager *p_loop_manager)
     });
 
     return *instance;
+}
+
+void WiFiManager::init()
+{
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        check_call<WiFiException>([]() { nvs_flash_erase(); });
+        check_call<WiFiException>([]() { nvs_flash_init(); });
+    }
+
+    check_call<WiFiException>([]() { esp_netif_init(); });
+
+    set_event_handler();
+    set_wifi_config();
+    check_call<WiFiException>([]() { esp_wifi_set_storage(WIFI_STORAGE_RAM); });
+    check_call<WiFiException>([]() { esp_wifi_start(); });
 }
 
 void WiFiManager::set_wifi_config()

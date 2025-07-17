@@ -50,15 +50,20 @@ public:
      */
     static WiFiManager &get_instance(LoopManager *p_loop_manager);
 
+    /**
+     * @brief Initializes and starts WiFi.
+     *
+     * Initializes NVS, network interfaces, and starts Wi-Fi in APSTA mode.
+     *
+     * @throws WiFiException if initialization or Wi-Fi start fails.
+     */
+    void init();
+
 private:
     /**
      * @brief Constructs the WiFiManager with the provided `LoopManager`.
      *
-     * Initializes NVS, network interfaces, and starts Wi-Fi in APSTA mode.
-     *
      * @param p_loop_manager Pointer to the loop manager for event dispatching.
-     *
-     * @throws WiFiException if initialization or Wi-Fi start fails.
      */
     WiFiManager(LoopManager *p_loop_manager);
 
