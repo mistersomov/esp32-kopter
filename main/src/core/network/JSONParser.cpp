@@ -19,7 +19,9 @@
 
 namespace kopter {
 
-inline static constexpr std::string_view TAG = "[JSONParser]";
+namespace {
+constexpr std::string_view TAG = "[JSONParser]";
+} // namespace
 
 cJSON *JSONParser::parse(const std::vector<char> &buffer)
 {
