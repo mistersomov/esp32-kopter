@@ -89,6 +89,11 @@ void WiFiManager::init()
     check_call<WiFiException>([]() { esp_wifi_start(); });
 }
 
+bool WiFiManager::is_ssid_empty() const
+{
+    return WIFI_STA_SSID == nullptr || std::strlen(WIFI_STA_SSID) == 0;
+}
+
 void WiFiManager::set_wifi_config()
 {
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();

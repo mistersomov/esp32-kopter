@@ -59,6 +59,13 @@ public:
      */
     void init();
 
+    /**
+     * @brief Checks SSID.
+     *
+     * @return `true` if SSID is empty.
+     */
+    bool is_ssid_empty() const;
+
 private:
     /**
      * @brief Constructs the WiFiManager with the provided `LoopManager`.
