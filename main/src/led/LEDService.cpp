@@ -104,9 +104,7 @@ void LEDService::configure_led(gpio_num_t gpio, size_t num_leds, led_model_t led
 
 void LEDService::blink(LEDColor color, uint32_t duration)
 {
-    if (m_blink_task.has_value()) {
-        return;
-    }
+    stop_blink();
 
     m_blink_running = true;
     m_blink_task.emplace(BLINK_TASK_NAME.data(), BLINK_TASK_STACK_SIZE, [this, color, duration]() {
@@ -124,26 +122,14 @@ void LEDService::stop_blink()
 
     m_blink_running = false;
 
-    for (int i = 0; i < 20; ++i) {
-        if (!m_blink_task.has_value()) {
-            break;
-        }
-        vTaskDelay(pdMS_TO_TICKS(BLINK_TASK_STOP_DELAY));
-    }
-
-    if (m_blink_task.has_value()) {
-        ESP_LOGW(TAG.data(), "Blink task did not stop gracefully, resetting");
-        m_blink_task.reset();
-    }
-
+    vTaskDelay(pdMS_TO_TICKS(BLINK_TASK_STOP_DELAY));
     off();
-    ESP_LOGW(TAG.data(), "Blink was stopped");
 }
 
 void LEDService::blink_once(LEDColor color, uint32_t duration)
 {
     if (m_led_strip_handler == nullptr) {
-        return;
+        throw LEDException(ESP_ERR_INVALID_STATE);
     }
 
     const auto rgb_color = parse_color(color);
@@ -152,6 +138,7 @@ void LEDService::blink_once(LEDColor color, uint32_t duration)
     vTaskDelay(pdMS_TO_TICKS(duration));
     fill_strip(COLORS[0]);
     vTaskDelay(pdMS_TO_TICKS(duration));
+    off();
 }
 
 void LEDService::off()

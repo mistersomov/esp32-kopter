@@ -65,8 +65,9 @@ public:
     /**
      * @brief Start blinking the LED strip continuously with the given color and duration.
      *
-     * This launches a background FreeRTOS task that repeatedly blinks the LEDs.
-     * If a blink task is already running, this call has no effect.
+     * This launches a background FreeRTOS task that repeatedly blinks the LEDs
+     * with the specified on/off duration and color. If a blink task is already running,
+     * it will be stopped and replaced by a new one with the updated parameters.
      *
      * @param color Color to blink.
      * @param duration Time in milliseconds for each on/off phase.
@@ -78,7 +79,7 @@ public:
     /**
      * @brief Stop the currently running blink task (if any) and turn off the LEDs.
      *
-     * The method attempts to stop the task gracefully. If the task doesn't exit within a timeout, it is forcibly reset.
+     * The method attempts to stop the task gracefully.
      *
      * @throws LEDException if clearing the LED strip fails.
      */
