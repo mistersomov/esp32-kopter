@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "OTAException.hpp"
 #include "OTAMeta.hpp"
 
 #include "esp_https_ota.h"
@@ -57,6 +58,8 @@ private:
 
     /**
      * @brief Downloads and parses the OTA metadata JSON file.
+     *
+     * @throws OTAException if fetching fails.
      */
     void fetch_ota_info();
 
@@ -64,6 +67,8 @@ private:
      * @brief Extracts metadata from the JSON buffer.
      *
      * @param buffer A character buffer containing the JSON payload.
+     *
+     * @throws OTAException if filling fails.
      */
     void fill_meta_info(const std::vector<char> &buffer);
 
@@ -78,6 +83,8 @@ private:
      * @brief Executes the OTA update using ESP-IDF's OTA API.
      *
      * If the update is successful, the device is restarted automatically.
+     *
+     * @throws OTAException if performing the update fails.
      */
     void perform_update() const;
 

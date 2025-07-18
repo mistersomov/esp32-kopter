@@ -19,8 +19,6 @@
 
 #include "FirmwareService.hpp"
 #include "JSONParser.hpp"
-#include "LoopManager.hpp"
-#include "OTAException.hpp"
 #include "Task.hpp"
 
 #include "esp_crt_bundle.h"
@@ -51,8 +49,14 @@ void OTAService::check_and_update()
 {
     check_call<OTAException>([this]() { fetch_ota_info(); });
 
-    if (!m_meta_info.url.empty()) {
-        new Task(TASK_NAME.data(), TASK_STACK_SIZE, [this]() { perform_update(); });
+    if (has_newer_version()) {
+        new Task(TASK_NAME.data(), TASK_STACK_SIZE, [this]() {
+            ESP_LOGI(TAG.data(), "Update available: %s", m_meta_info.url.c_str());
+            perform_update();
+        });
+    }
+    else {
+        ESP_LOGI(TAG.data(), "Already up-to-date.");
     }
 }
 
@@ -69,44 +73,37 @@ void OTAService::fetch_ota_info()
     esp_http_client_handle_t client = esp_http_client_init(&http_cfg);
     if (!client) {
         ESP_LOGE(TAG.data(), "Failed to init HTTP client");
-        return;
+        throw OTAException(ESP_ERR_HTTP_BASE);
     }
     esp_err_t err = esp_http_client_open(client, 0);
     if (err != ESP_OK) {
         ESP_LOGE(TAG.data(), "Failed to open HTTP connection");
-        return;
+        throw OTAException(ESP_ERR_HTTP_CONNECTING);
     }
     int64_t content_length = esp_http_client_fetch_headers(client);
     if (content_length <= 0) {
         ESP_LOGE(TAG.data(), "Invalid content length");
         close_and_cleanup_http_client(client);
-        return;
+        throw OTAException(ESP_ERR_INVALID_SIZE);
     }
     std::vector<char> buffer(content_length + 1);
     int read_len = esp_http_client_read(client, buffer.data(), content_length);
     if (read_len < 0) {
         ESP_LOGE(TAG.data(), "Read failed");
         close_and_cleanup_http_client(client);
-        return;
+        throw OTAException(ESP_ERR_INVALID_SIZE);
     }
     buffer[read_len] = '\0';
 
     close_and_cleanup_http_client(client);
     fill_meta_info(buffer);
-
-    if (has_newer_version()) {
-        ESP_LOGI(TAG.data(), "Update available: %s", m_meta_info.url.c_str());
-    }
-    else {
-        ESP_LOGI(TAG.data(), "Already up-to-date.");
-    }
 }
 
 void OTAService::fill_meta_info(const std::vector<char> &buffer)
 {
     auto json = JSONParser::parse(buffer);
     if (json == nullptr) {
-        return;
+        throw OTAException(ESP_ERR_INVALID_STATE);
     }
     auto version = JSONParser::get_json_by_name(json, "version");
     auto url = JSONParser::get_json_by_name(json, "url");
@@ -114,7 +111,7 @@ void OTAService::fill_meta_info(const std::vector<char> &buffer)
     if (!(cJSON_IsNumber(version) && cJSON_IsString(url) && (url->valuestring != nullptr))) {
         ESP_LOGE(TAG.data(), "Invalid JSON structure. Content: %s", buffer.data());
         cJSON_Delete(json);
-        return;
+        throw OTAException(ESP_ERR_INVALID_RESPONSE);
     }
 
     m_meta_info.url = std::string(url->valuestring);
@@ -134,7 +131,7 @@ void OTAService::perform_update() const
     http_cfg.url = m_meta_info.url.c_str();
     http_cfg.crt_bundle_attach = esp_crt_bundle_attach;
     http_cfg.timeout_ms = RECV_TIMEOUT;
-    http_cfg.buffer_size = 2048;
+    http_cfg.buffer_size = BUFFER_SIZE;
     http_cfg.keep_alive_enable = true;
     http_cfg.disable_auto_redirect = true;
     http_cfg.transport_type = HTTP_TRANSPORT_OVER_SSL;
@@ -145,10 +142,12 @@ void OTAService::perform_update() const
     esp_err_t ret = esp_https_ota(&ota_cfg);
     if (ret == ESP_OK) {
         ESP_LOGI(TAG.data(), "OTA successful, restarting...");
+        FirmwareService::get_instance().set_version(m_meta_info.version);
         esp_restart();
     }
     else {
         ESP_LOGE(TAG.data(), "OTA failed: %s", esp_err_to_name(ret));
+        throw OTAException(ESP_ERR_NOT_FINISHED);
     }
 }
 
