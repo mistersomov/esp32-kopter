@@ -49,13 +49,15 @@ set(srcdirs
         "src/sensor/imu/mpu6050"
 )
 set(reqs
+        esp_adc
+        esp_driver_gpio
+        esp_driver_ledc
         esp_event
+        esp_https_ota
+        esp_netif
         esp_wifi
         nvs_flash
-        esp_netif
-        esp_adc
         glm
-        esp_https_ota
         json
         mbedtls
 )

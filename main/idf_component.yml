@@ -2,7 +2,6 @@
 dependencies:
   led_strip: "^3.0.1~1"
   pid_ctrl: "^0.1.1"
-  bdc_motor: "^0.1.0"
   esp-idf-cxx: 
     version: "^1.0.0"
     pre_release: true

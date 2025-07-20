@@ -22,81 +22,28 @@
 
 namespace kopter {
 
-namespace {
-constexpr uint8_t MCPWM_GROUP_ID_0 = 0;
-constexpr uint32_t MCPWM_FREQ_HZ = 5000;
-constexpr uint32_t MCPWM_TIMER_RESOLUTION_HZ = 1000000;
-constexpr uint32_t MCPWM_DUTY_TICK_MAX =
-    MCPWM_TIMER_RESOLUTION_HZ / MCPWM_FREQ_HZ; // maximum value we can set for the duty cycle, in ticks
-} // namespace
-
-BDCMotor::BDCMotor(gpio_num_t gpio) : IMotor()
+BDCMotor::BDCMotor(gpio_num_t gpio, const ledc_channel_config_t &channel_cfg, const uint32_t duty_max)
+    : IMotor(), m_channel_cfg{std::move(channel_cfg)}, m_duty_max{duty_max}
 {
-    bdc_motor_config_t motor_config{};
-    motor_config.pwm_freq_hz = MCPWM_FREQ_HZ;
-    motor_config.pwma_gpio_num = gpio;
-
-    bdc_motor_mcpwm_config_t mcpwm_config{};
-    mcpwm_config.group_id = MCPWM_GROUP_ID_0;
-    mcpwm_config.resolution_hz = MCPWM_TIMER_RESOLUTION_HZ;
-
-    try {
-        check_call<MotorException>(
-            [&]() { CHECK_THROW(bdc_motor_new_mcpwm_device(&motor_config, &mcpwm_config, &m_motor)); });
-    }
-    catch (const MotorException &e) {
-        // If MCPWM group 0 is unavailable, fallback to group 1
-        if (e.error == ESP_ERR_NOT_FOUND) {
-            mcpwm_config.group_id = MCPWM_GROUP_ID_1;
-
-            check_call<MotorException>(
-                [&]() { CHECK_THROW(bdc_motor_new_mcpwm_device(&motor_config, &mcpwm_config, &m_motor)); });
-        }
-        else {
-            throw e;
-        }
-    }
-    enable();
     set_speed(0.0f);
-}
-
-BDCMotor::~BDCMotor()
-{
-    if (m_motor) {
-        check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_del(m_motor)); });
-    }
 }
 
 void BDCMotor::enable()
 {
-    check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_enable(m_motor)); });
+    set_speed(0.0f);
 }
 
 void BDCMotor::disable()
 {
-    check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_disable(m_motor)); });
+    check_call<MotorException>(ledc_stop(m_channel_cfg.speed_mode, m_channel_cfg.channel, 0));
 }
 
 void BDCMotor::set_speed(float speed)
 {
-    check_call<MotorException>([speed, this]() {
-        CHECK_THROW(bdc_motor_set_speed(m_motor, static_cast<uint32_t>(speed * MCPWM_DUTY_TICK_MAX)));
-    });
-}
+    const uint32_t duty = static_cast<uint32_t>(speed * m_duty_max);
 
-void BDCMotor::coast()
-{
-    check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_coast(m_motor)); });
-}
-
-void BDCMotor::forward()
-{
-    check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_forward(m_motor)); });
-}
-
-void BDCMotor::reverse()
-{
-    check_call<MotorException>([this]() { CHECK_THROW(bdc_motor_reverse(m_motor)); });
+    check_call<MotorException>(ledc_set_duty(m_channel_cfg.speed_mode, m_channel_cfg.channel, duty));
+    check_call<MotorException>(ledc_update_duty(m_channel_cfg.speed_mode, m_channel_cfg.channel));
 }
 
 } // namespace kopter
