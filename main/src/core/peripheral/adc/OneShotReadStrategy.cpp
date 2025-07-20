@@ -32,12 +32,12 @@ void OneShotReadStrategy::read(reading_callback cb)
 {
     for (const auto &chnl : m_channels) {
         int raw_value = 0;
-        check_call<ADCException>([&]() { adc_oneshot_read(m_one_shot_handler, chnl, &raw_value); });
+        check_call<ADCException>(adc_oneshot_read(m_one_shot_handler, chnl, &raw_value));
         ADCSample sample{.channel = chnl, .raw = raw_value};
 
         if (m_cali_handler) {
             int voltage = 0;
-            check_call<ADCException>([&]() { adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage); });
+            check_call<ADCException>(adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage));
             sample.voltage = voltage;
         }
         cb(sample);

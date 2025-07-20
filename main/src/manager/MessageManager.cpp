@@ -22,8 +22,6 @@
 
 namespace kopter {
 
-#define MSG_CHECK_THROW(err) CHECK_THROW_WITH(err, MessageException)
-
 #define WIFI_CHANNEL CONFIG_WIFI_AP_CHANNEL
 #if CONFIG_WIFI_MODE_SOFTAP
 #define ESPNOW_WIFI_IF WIFI_IF_AP
@@ -60,10 +58,10 @@ MessageManager::MessageManager()
 
     m_callback_instance = this;
 
-    MSG_CHECK_THROW(esp_now_init());
-    MSG_CHECK_THROW(esp_now_register_send_cb(esp_now_send_cb));
-    MSG_CHECK_THROW(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
-    MSG_CHECK_THROW(add_peer_to_list());
+    check_call<MessageException>(esp_now_init());
+    check_call<MessageException>(esp_now_register_send_cb(esp_now_send_cb));
+    check_call<MessageException>(esp_now_register_recv_cb(esp_now_recv_cb_forwarder));
+    check_call<MessageException>(add_peer_to_list());
     create_msg_receive_task();
 }
 
@@ -77,7 +75,7 @@ MessageManager::~MessageManager()
         vQueueDelete(m_msg_queue);
         m_msg_queue = nullptr;
     }
-    MSG_CHECK_THROW(esp_now_deinit());
+    check_call<MessageException>(esp_now_deinit());
 }
 
 MessageManager &MessageManager::get_instance()

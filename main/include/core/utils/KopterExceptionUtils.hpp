@@ -18,27 +18,16 @@
 
 #include "KopterException.hpp"
 
+#include "esp_log.h"
+
 #include <type_traits>
 
 namespace kopter {
 
-#define CHECK_THROW_WITH(error, exception_type)                                                                        \
-    do {                                                                                                               \
-        esp_err_t result = (error);                                                                                    \
-        if (result != ESP_OK)                                                                                          \
-            throw kopter::exception_type(result);                                                                      \
-    } while (0)
-
-template <typename Exception,
-          typename Func,
-          typename = std::enable_if_t<std::is_base_of<KopterException, Exception>::value>>
-inline auto check_call(Func func) -> decltype(func())
+template <typename Exception> inline void check_call(esp_err_t err)
 {
-    try {
-        return func();
-    }
-    catch (const idf::ESPException &e) {
-        throw Exception(e.error);
+    if (err != ESP_OK) {
+        throw Exception(err);
     }
 }
 

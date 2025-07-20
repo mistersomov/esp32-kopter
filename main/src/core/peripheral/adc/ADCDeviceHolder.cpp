@@ -54,16 +54,16 @@ ADCDeviceHolder::~ADCDeviceHolder()
 {
     if (m_continuous_handler) {
         stop_polling();
-        ADC_CHECK_THROW(adc_continuous_deinit(m_continuous_handler));
+        check_call<ADCException>(adc_continuous_deinit(m_continuous_handler));
     }
     if (m_one_shot_handler) {
-        ADC_CHECK_THROW(adc_oneshot_del_unit(m_one_shot_handler));
+        check_call<ADCException>(adc_oneshot_del_unit(m_one_shot_handler));
     }
     if (m_cali_handler) {
 #ifdef ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
-        ADC_CHECK_THROW(adc_cali_delete_scheme_curve_fitting(m_cali_handler));
+        check_call<ADCException>(adc_cali_delete_scheme_curve_fitting(m_cali_handler));
 #elif defined(ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED)
-        ADC_CHECK_THROW(adc_cali_delete_scheme_line_fitting(m_cali_handler));
+        check_call<ADCException>(adc_cali_delete_scheme_line_fitting(m_cali_handler));
 #endif
     }
 }
@@ -101,16 +101,12 @@ ADCDevice *ADCDeviceHolder::add_device(const std::string &name,
 
 void ADCDeviceHolder::start_polling()
 {
-    try {
-        ADC_CHECK_THROW(adc_continuous_start(m_continuous_handler));
-    }
-    catch (const ADCException &e) {
-    }
+    check_call<ADCException>(adc_continuous_start(m_continuous_handler));
 }
 
 void ADCDeviceHolder::stop_polling()
 {
-    ADC_CHECK_THROW(adc_continuous_stop(m_continuous_handler));
+    check_call<ADCException>(adc_continuous_stop(m_continuous_handler));
 }
 
 void ADCDeviceHolder::configure_continuous_driver()
@@ -122,7 +118,7 @@ void ADCDeviceHolder::configure_continuous_driver()
     adc_continuous_handle_cfg_t adc_cfg{};
     adc_cfg.max_store_buf_size = MAX_STORE_BUF_SIZE;
     adc_cfg.conv_frame_size = CONV_FRAME_SIZE;
-    ADC_CHECK_THROW(adc_continuous_new_handle(&adc_cfg, &m_continuous_handler));
+    check_call<ADCException>(adc_continuous_new_handle(&adc_cfg, &m_continuous_handler));
 }
 
 void ADCDeviceHolder::configure_one_shot_driver()
@@ -131,7 +127,7 @@ void ADCDeviceHolder::configure_one_shot_driver()
     adc_one_shot_cfg.unit_id = ADC_UNIT_1;
     adc_one_shot_cfg.ulp_mode = ADC_ULP_MODE_DISABLE;
 
-    ADC_CHECK_THROW(adc_oneshot_new_unit(&adc_one_shot_cfg, &m_one_shot_handler));
+    check_call<ADCException>(adc_oneshot_new_unit(&adc_one_shot_cfg, &m_one_shot_handler));
 }
 
 void ADCDeviceHolder::configure_calibration()
@@ -168,7 +164,7 @@ void ADCDeviceHolder::configure_curve_fitting_calibration()
     cali_config.unit_id = ADC_UNIT_1;
     cali_config.atten = ATTENUATION;
     cali_config.bitwidth = BITWIDTH;
-    ADC_CHECK_THROW(adc_cali_create_scheme_curve_fitting(&cali_config, &m_cali_handler));
+    check_call<ADCException>(adc_cali_create_scheme_curve_fitting(&cali_config, &m_cali_handler));
 }
 
 #elif defined(ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED)
@@ -178,7 +174,7 @@ void ADCDeviceHolder::configure_line_fitting_calibration()
     cali_config.unit_id = ADC_UNIT_1;
     cali_config.atten = ATTENUATION;
     cali_config.bitwidth = BITWIDTH;
-    ADC_CHECK_THROW(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
+    check_call<ADCException>(adc_cali_create_scheme_line_fitting(&cali_config, &m_cali_handler));
 }
 #endif
 
@@ -204,11 +200,7 @@ void ADCDeviceHolder::add_device_continuous(const std::unordered_set<adc_channel
 
     dig_cfg.adc_pattern = digi_pattern_cfgs.data();
 
-    try {
-        ADC_CHECK_THROW(adc_continuous_config(m_continuous_handler, &dig_cfg));
-    }
-    catch (const ADCException &e) {
-    }
+    check_call<ADCException>(adc_continuous_config(m_continuous_handler, &dig_cfg));
 }
 
 void ADCDeviceHolder::add_device_one_shot(const std::unordered_set<adc_channel_t> &channels)
@@ -218,7 +210,7 @@ void ADCDeviceHolder::add_device_one_shot(const std::unordered_set<adc_channel_t
     cfg.bitwidth = BITWIDTH;
 
     for (const auto &chnl : channels) {
-        ADC_CHECK_THROW(adc_oneshot_config_channel(m_one_shot_handler, chnl, &cfg));
+        check_call<ADCException>(adc_oneshot_config_channel(m_one_shot_handler, chnl, &cfg));
     }
 }
 

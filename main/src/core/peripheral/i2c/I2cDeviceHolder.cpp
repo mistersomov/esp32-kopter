@@ -22,10 +22,9 @@ using namespace idf;
 
 namespace kopter {
 
-#define SDA_PIN CONFIG_I2C_SDA_PIN
-#define SCL_PIN CONFIG_I2C_SCL_PIN
-
 namespace {
+constexpr uint32_t SDA_PIN = CONFIG_I2C_SDA_PIN;
+constexpr uint32_t SCL_PIN = CONFIG_I2C_SCL_PIN;
 constexpr uint32_t FREQUENCY = 400000;
 } // namespace
 
@@ -49,13 +48,8 @@ I2cDevice *I2cDeviceHolder::add_device(const std::string &name, const uint8_t &a
         return m_devices[name].get();
     }
 
-    try {
-        m_devices[name] = std::make_unique<I2cDevice>(I2CAddress(std::move(address)), m_master.get());
-        return m_devices[name].get();
-    }
-    catch (const I2CException &e) {
-        throw I2cException(e.error);
-    }
+    m_devices[name] = std::make_unique<I2cDevice>(I2CAddress(std::move(address)), m_master.get());
+    return m_devices[name].get();
 }
 
 } // namespace kopter

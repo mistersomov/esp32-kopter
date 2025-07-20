@@ -17,11 +17,7 @@
 #pragma once
 
 namespace kopter {
-
-#define ADC_CHECK_THROW(err) CHECK_THROW_WITH(err, ADCException)
-
 struct ADCException : public KopterException {
     ADCException(esp_err_t error);
 };
-
 } // namespace kopter

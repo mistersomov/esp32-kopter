@@ -50,8 +50,8 @@ WiFiManager::WiFiManager(LoopManager *p_loop_manager) : m_loop_manager{p_loop_ma
 
 WiFiManager::~WiFiManager()
 {
-    check_call<WiFiException>([&]() { esp_wifi_disconnect(); });
-    check_call<WiFiException>([&]() { esp_wifi_stop(); });
+    check_call<WiFiException>(esp_wifi_disconnect());
+    check_call<WiFiException>(esp_wifi_stop());
     if (m_netif_ap) {
         esp_netif_destroy(m_netif_ap);
     }
@@ -77,16 +77,16 @@ void WiFiManager::init()
 {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        check_call<WiFiException>([]() { nvs_flash_erase(); });
-        check_call<WiFiException>([]() { nvs_flash_init(); });
+        check_call<WiFiException>(nvs_flash_erase());
+        check_call<WiFiException>(nvs_flash_init());
     }
 
-    check_call<WiFiException>([]() { esp_netif_init(); });
+    check_call<WiFiException>(esp_netif_init());
 
     set_event_handler();
     set_wifi_config();
-    check_call<WiFiException>([]() { esp_wifi_set_storage(WIFI_STORAGE_RAM); });
-    check_call<WiFiException>([]() { esp_wifi_start(); });
+    check_call<WiFiException>(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    check_call<WiFiException>(esp_wifi_start());
 }
 
 bool WiFiManager::is_ssid_empty() const
@@ -97,8 +97,8 @@ bool WiFiManager::is_ssid_empty() const
 void WiFiManager::set_wifi_config()
 {
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
-    check_call<WiFiException>([&]() { esp_wifi_init(&init_cfg); });
-    check_call<WiFiException>([&]() { esp_wifi_set_mode(WIFI_MODE_APSTA); });
+    check_call<WiFiException>(esp_wifi_init(&init_cfg));
+    check_call<WiFiException>(esp_wifi_set_mode(WIFI_MODE_APSTA));
     set_wifi_ap_config();
     set_wifi_sta_config();
 }
@@ -123,7 +123,7 @@ void WiFiManager::set_wifi_ap_config()
     StringUtils::copy(ap_cfg.ap.ssid, WIFI_AP_SSID);
     StringUtils::copy(ap_cfg.ap.password, WIFI_AP_PASSWD);
 
-    check_call<WiFiException>([&ap_cfg]() { esp_wifi_set_config(WIFI_IF_AP, &ap_cfg); });
+    check_call<WiFiException>(esp_wifi_set_config(WIFI_IF_AP, &ap_cfg));
 }
 
 void WiFiManager::set_wifi_sta_config()
@@ -136,7 +136,7 @@ void WiFiManager::set_wifi_sta_config()
     StringUtils::copy(sta_cfg.sta.ssid, WIFI_STA_SSID);
     StringUtils::copy(sta_cfg.sta.password, WIFI_STA_PASSWD);
 
-    check_call<WiFiException>([&sta_cfg]() { esp_wifi_set_config(WIFI_IF_STA, &sta_cfg); });
+    check_call<WiFiException>(esp_wifi_set_config(WIFI_IF_STA, &sta_cfg));
 }
 
 void WiFiManager::set_event_handler()
@@ -154,7 +154,7 @@ void WiFiManager::set_event_handler()
 
 void WiFiManager::sta_do_connect()
 {
-    check_call<WiFiException>([]() { esp_wifi_connect(); });
+    check_call<WiFiException>(esp_wifi_connect());
 }
 
 void WiFiManager::sta_do_reconnect()

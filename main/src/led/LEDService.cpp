@@ -57,17 +57,16 @@ RGBColor LEDService::parse_color(LEDColor color) noexcept
 void LEDService::fill_strip(const RGBColor &color)
 {
     for (size_t i = 0; i != m_num_leds; i++) {
-        check_call<LEDException>(
-            [this, i, &color]() { led_strip_set_pixel(m_led_strip_handler, i, color.r, color.g, color.b); });
+        check_call<LEDException>(led_strip_set_pixel(m_led_strip_handler, i, color.r, color.g, color.b));
     }
-    check_call<LEDException>([this]() { led_strip_refresh(m_led_strip_handler); });
+    check_call<LEDException>(led_strip_refresh(m_led_strip_handler));
 }
 
 LEDService::~LEDService()
 {
     if (m_led_strip_handler) {
         off();
-        check_call<LEDException>([this]() { led_strip_del(m_led_strip_handler); });
+        check_call<LEDException>(led_strip_del(m_led_strip_handler));
     }
 }
 
@@ -98,8 +97,7 @@ void LEDService::configure_led(gpio_num_t gpio, size_t num_leds, led_model_t led
     rmt_cfg.resolution_hz = RMT_HZ_RESOLUTION;
     rmt_cfg.flags.with_dma = false;
 
-    check_call<LEDException>(
-        [this, &cfg, &rmt_cfg]() { led_strip_new_rmt_device(&cfg, &rmt_cfg, &m_led_strip_handler); });
+    check_call<LEDException>(led_strip_new_rmt_device(&cfg, &rmt_cfg, &m_led_strip_handler));
 }
 
 void LEDService::blink(LEDColor color, uint32_t duration)
@@ -144,7 +142,7 @@ void LEDService::blink_once(LEDColor color, uint32_t duration)
 void LEDService::off()
 {
     if (m_led_strip_handler) {
-        check_call<LEDException>([this]() { led_strip_clear(m_led_strip_handler); });
+        check_call<LEDException>(led_strip_clear(m_led_strip_handler));
     }
 }
 

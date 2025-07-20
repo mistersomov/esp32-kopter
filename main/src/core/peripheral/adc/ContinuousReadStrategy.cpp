@@ -46,7 +46,7 @@ void ContinuousReadStrategy::read(reading_callback cb)
     uint32_t out_length = 0;
 
     check_call<ADCException>(
-        [&]() { adc_continuous_read(m_continuous_handler, m_buf.data(), m_frame_size, &out_length, TIMEOUT); });
+        adc_continuous_read(m_continuous_handler, m_buf.data(), m_frame_size, &out_length, TIMEOUT));
 
     if (out_length > 0) {
         size_t sample_count = out_length / sizeof(adc_digi_output_data_t);
@@ -59,7 +59,7 @@ void ContinuousReadStrategy::read(reading_callback cb)
 
             if (m_cali_handler) {
                 int voltage = 0;
-                check_call<ADCException>([&]() { adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage); });
+                check_call<ADCException>(adc_cali_raw_to_voltage(m_cali_handler, raw_value, &voltage));
                 sample.voltage = voltage;
             }
             cb(sample);

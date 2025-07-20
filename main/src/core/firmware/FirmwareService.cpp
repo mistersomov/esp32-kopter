@@ -36,8 +36,8 @@ FirmwareService::FirmwareService()
 {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        check_call<FirmwareException>([]() { nvs_flash_erase(); });
-        check_call<FirmwareException>([]() { nvs_flash_init(); });
+        check_call<FirmwareException>(nvs_flash_erase());
+        check_call<FirmwareException>(nvs_flash_init());
     }
 }
 

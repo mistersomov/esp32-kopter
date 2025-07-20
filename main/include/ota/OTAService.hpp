@@ -59,18 +59,25 @@ private:
     /**
      * @brief Downloads and parses the OTA metadata JSON file.
      *
-     * @throws OTAException if fetching fails.
+     * @return
+     *     - ESP_OK: Success
+     *     - ESP_ERR_HTTP_BASE: HTTP-client initialization fails.
+     *     - ESP_ERR_HTTP_CONNECTING: HTTP-connection fails.
+     *     - ESP_ERR_INVALID_SIZE: Content length or reading length is wrong.
      */
-    void fetch_ota_info();
+    esp_err_t fetch_ota_info();
 
     /**
      * @brief Extracts metadata from the JSON buffer.
      *
      * @param buffer A character buffer containing the JSON payload.
      *
-     * @throws OTAException if filling fails.
+     * @return
+     *     - ESP_OK: Success.
+     *     - ESP_ERR_INVALID_STATE: Parsing JSON fails.
+     *     - ESP_ERR_INVALID_RESPONSE: Invalid JSON structure.
      */
-    void fill_meta_info(const std::vector<char> &buffer);
+    esp_err_t fill_meta_info(const std::vector<char> &buffer);
 
     /**
      * @brief Compares the current firmware version with the version in the metadata.
