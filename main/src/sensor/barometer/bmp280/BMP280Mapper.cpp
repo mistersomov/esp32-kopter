@@ -24,7 +24,8 @@ namespace {
 constexpr float SEA_LEVEL_PRESSURE = 101325.0f;
 constexpr float ALTITUDE_SCALE = 44330.0f;
 constexpr float ALTITUDE_EXPONENT = 0.1903f;
-constexpr float HPA2PA = 256.0f * 100.0f; // Convert to Pa: raw / 256 gives hPa, multiply by 100 to get Pa
+constexpr float HPA2PA =
+    1.0f / 2.560f; // Convert BMP280 raw compensated output to Pa (final formula: Pa = raw * HPA2PA)
 } // namespace
 
 BMP280Mapper::BMP280Mapper() : m_t_fine{0}
@@ -51,7 +52,7 @@ float BMP280Mapper::get_compensated_temperature(int32_t adc_t, BMP280Calibration
     const int32_t adc_t_shifted_3 = static_cast<int32_t>(adc_t >> 3);
     const int32_t adc_t_shifted_4 = static_cast<int32_t>(adc_t >> 4);
     const int32_t dig_T1 = static_cast<int32_t>(calib->dig_T1);
-    const int32_t dig_T2 = static_cast<int32_t>(calib->dig_P1);
+    const int32_t dig_T2 = static_cast<int32_t>(calib->dig_T2);
     const int32_t dig_T3 = static_cast<int32_t>(calib->dig_T3);
 
     const int32_t delta_3 = adc_t_shifted_3 - (dig_T1 << 1);
@@ -95,7 +96,7 @@ float BMP280Mapper::get_compensated_pressure(uint32_t adc_p, BMP280Calibration *
     pressure = ((pressure + var1 + var2) >> 8) + (dig_P7 << 4);
     pressure = static_cast<uint32_t>(pressure);
 
-    return static_cast<float>(pressure) / HPA2PA;
+    return static_cast<float>(pressure) * HPA2PA;
 }
 
 } // namespace kopter
