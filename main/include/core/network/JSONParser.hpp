@@ -41,5 +41,12 @@ struct JSONParser {
      * @return A pointer to the corresponding `cJSON` item, or `nullptr` if not found.
      */
     static const cJSON *get_json_by_name(const cJSON *object, const std::string_view &name);
+
+    /**
+     * @brief Deletes a JSON object.
+     *
+     * @param object JSON object.
+     */
+    static void delete_json(cJSON *object) noexcept;
 };
 } // namespace kopter

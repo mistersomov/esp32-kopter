@@ -43,4 +43,9 @@ const cJSON *JSONParser::get_json_by_name(const cJSON *object, const std::string
     return result;
 }
 
+void JSONParser::delete_json(cJSON *object) noexcept
+{
+    cJSON_Delete(object);
+}
+
 } // namespace kopter
