@@ -17,7 +17,7 @@
 #include "pch.hpp"
 #include "WiFiManager.hpp"
 
-#include "LoopManager.hpp"
+#include "EventService.hpp"
 #include "Message.hpp"
 #include "StringUtils.hpp"
 #include "WiFiException.hpp"
@@ -44,7 +44,7 @@ constexpr uint16_t RECONNECT_DELAY = 1000;
 constexpr std::string_view TAG = "[WiFiManager]";
 } // namespace
 
-WiFiManager::WiFiManager(LoopManager *p_loop_manager) : m_loop_manager{p_loop_manager}, m_retry_count{0}
+WiFiManager::WiFiManager(EventService *p_event_service) : m_event_service{p_event_service}, m_retry_count{0}
 {
 }
 
@@ -60,14 +60,14 @@ WiFiManager::~WiFiManager()
     }
 }
 
-WiFiManager &WiFiManager::get_instance(LoopManager *p_loop_manager)
+WiFiManager &WiFiManager::get_instance(EventService *p_event_service)
 {
     static std::once_flag flag;
     static std::unique_ptr<WiFiManager> instance;
 
     std::call_once(flag, [&]() {
-        assert(p_loop_manager != nullptr && "LoopManager must not be null on first call");
-        instance.reset(new WiFiManager(p_loop_manager));
+        assert(p_event_service != nullptr && "EventService must not be null on first call");
+        instance.reset(new WiFiManager(p_event_service));
     });
 
     return *instance;
@@ -142,14 +142,14 @@ void WiFiManager::set_wifi_sta_config()
 void WiFiManager::set_event_handler()
 {
     m_event_regs.push_back(
-        m_loop_manager->register_system_event(STA_START_EVENT,
-                                              [this](const idf::event::ESPEvent &, void *) { sta_do_connect(); }));
+        m_event_service->register_system_event(STA_START_EVENT,
+                                               [this](const idf::event::ESPEvent &, void *) { sta_do_connect(); }));
     m_event_regs.push_back(
-        m_loop_manager->register_system_event(STA_DISCONNECTED_EVENT,
-                                              [this](const idf::event::ESPEvent &, void *) { sta_do_reconnect(); }));
+        m_event_service->register_system_event(STA_DISCONNECTED_EVENT,
+                                               [this](const idf::event::ESPEvent &, void *) { sta_do_reconnect(); }));
     m_event_regs.push_back(
-        m_loop_manager->register_system_event(IP_GOT_EVENT,
-                                              [this](const idf::event::ESPEvent &, void *) { m_retry_count = 0; }));
+        m_event_service->register_system_event(IP_GOT_EVENT,
+                                               [this](const idf::event::ESPEvent &, void *) { m_retry_count = 0; }));
 }
 
 void WiFiManager::sta_do_connect()

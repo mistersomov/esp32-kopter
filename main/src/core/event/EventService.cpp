@@ -15,7 +15,7 @@
  */
 
 #include "pch.hpp"
-#include "LoopManager.hpp"
+#include "EventService.hpp"
 
 using namespace idf::event;
 
@@ -41,27 +41,43 @@ static esp_event_loop_args_t make_loop_args()
     return args;
 }
 
-LoopManager::LoopManager()
+EventService::EventService()
     : m_default_loop(std::make_shared<ESPEventLoop>(std::make_shared<ESPEventAPIDefault>())),
       m_custom_loop(std::make_shared<ESPEventLoop>(std::make_shared<ESPEventAPICustom>(make_loop_args())))
 {
 }
 
-std::unique_ptr<ESPEventReg> LoopManager::register_system_event(const ESPEvent &event,
-                                                                std::function<void(const ESPEvent &, void *)> cb)
+EventService &EventService::get_instance()
+{
+    static EventService instance;
+    return instance;
+}
+
+ESPEventLoop *EventService::get_default_loop() const
+{
+    return m_default_loop.get();
+}
+
+ESPEventLoop *EventService::get_custom_loop() const
+{
+    return m_custom_loop.get();
+}
+
+std::unique_ptr<ESPEventReg> EventService::register_system_event(const ESPEvent &event,
+                                                                 std::function<void(const ESPEvent &, void *)> cb)
 {
     std::unique_ptr<ESPEventReg> system_event = m_default_loop->register_event(event, cb);
     return system_event;
 }
 
-std::unique_ptr<idf::event::ESPEventReg> LoopManager::register_event(
+std::unique_ptr<idf::event::ESPEventReg> EventService::register_event(
     const idf::event::ESPEvent &event, std::function<void(const idf::event::ESPEvent &, void *)> cb)
 {
     std::unique_ptr<ESPEventReg> system_event = m_custom_loop->register_event(event, cb);
     return system_event;
 }
 
-void LoopManager::post_event(const idf::event::ESPEvent &event)
+void EventService::post_event(const idf::event::ESPEvent &event)
 {
     m_custom_loop->post_event_data(event);
 }

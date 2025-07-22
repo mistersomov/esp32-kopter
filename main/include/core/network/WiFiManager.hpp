@@ -22,7 +22,7 @@
 
 namespace kopter {
 
-class LoopManager;
+class EventService;
 
 /**
  * @brief Singleton class for managing Wi-Fi in AP+STA mode using ESP-IDF.
@@ -45,10 +45,10 @@ public:
     /**
      * @brief Returns a singleton instance of WiFiManager.
      *
-     * @param p_loop_manager Pointer to `LoopManager` used for event registration. Must not be null on first call.
+     * @param p_event_service Pointer to `EventService` used for event registration. Must not be null on first call.
      * @return `WiFiManager&` Reference to the singleton instance.
      */
-    static WiFiManager &get_instance(LoopManager *p_loop_manager);
+    static WiFiManager &get_instance(EventService *p_event_service);
 
     /**
      * @brief Initializes and starts WiFi.
@@ -68,11 +68,11 @@ public:
 
 private:
     /**
-     * @brief Constructs the WiFiManager with the provided `LoopManager`.
+     * @brief Constructs the WiFiManager with the provided `EventService`.
      *
-     * @param p_loop_manager Pointer to the loop manager for event dispatching.
+     * @param p_event_service Pointer to the loop manager for event dispatching.
      */
-    WiFiManager(LoopManager *p_loop_manager);
+    WiFiManager(EventService *p_event_service);
 
     /**
      * @brief Initializes Wi-Fi and sets AP + STA configuration.
@@ -119,7 +119,7 @@ private:
 
     constexpr wifi_auth_mode_t get_auth_mode() const;
 
-    LoopManager *m_loop_manager{nullptr};
+    EventService *m_event_service{nullptr};
     esp_netif_t *m_netif_ap{nullptr};
     esp_netif_t *m_netif_sta{nullptr};
     std::vector<std::unique_ptr<idf::event::ESPEventReg>> m_event_regs;

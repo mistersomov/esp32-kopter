@@ -7,6 +7,7 @@ endif()
 set(includedirs 
         "include"
         "include/core"
+        "include/core/event"
         "include/core/exception"
         "include/core/firmware"
         "include/core/network"
@@ -30,6 +31,7 @@ set(includedirs
 )
 set(srcdirs 
         "src"
+        "src/core/event"
         "src/core/firmware"
         "src/core/network"
         "src/core/peripheral/adc"
