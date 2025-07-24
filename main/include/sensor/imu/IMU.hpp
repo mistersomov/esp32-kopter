@@ -17,6 +17,7 @@
 #pragma once
 
 #include "IDevice.hpp"
+#include "IMUData.hpp"
 
 namespace kopter {
 
@@ -48,46 +49,11 @@ struct IMU : public IDevice {
     virtual const char *get_name() const noexcept override;
 
     /**
-     * @brief Reads the acceleration along the X-axis in g.
+     * @brief Returns the current sensor readings.
      *
-     * @return Acceleration value in g.
+     * @return An instance of IMUData containing accelerometer and gyroscope values.
      */
-    virtual float read_ax() const = 0;
-
-    /**
-     * @brief Reads the acceleration along the Y-axis in g.
-     *
-     * @return Acceleration value in g.
-     */
-    virtual float read_ay() const = 0;
-
-    /**
-     * @brief Reads the acceleration along the Z-axis in g.
-     *
-     * @return Acceleration value in g.
-     */
-    virtual float read_az() const = 0;
-
-    /**
-     * @brief Reads the angular velocity around the X-axis in degrees/sec.
-     *
-     * @return Angular velocity in degrees per second.
-     */
-    virtual float read_gx() const = 0;
-
-    /**
-     * @brief Reads the angular velocity around the Y-axis in degrees/sec.
-     *
-     * @return Angular velocity in degrees per second.
-     */
-    virtual float read_gy() const = 0;
-
-    /**
-     * @brief Reads the angular velocity around the Z-axis in degrees/sec.
-     *
-     * @return Angular velocity in degrees per second.
-     */
-    virtual float read_gz() const = 0;
+    virtual IMUData get_data() = 0;
 };
 
 } // namespace kopter

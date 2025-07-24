@@ -37,7 +37,7 @@ const glm::quat &ComplementaryFilter::get_quat() const noexcept
     return m_quat;
 }
 
-void ComplementaryFilter::update(float gx, float gy, float gz, float ax, float ay, float az, int64_t timestamp_us)
+void ComplementaryFilter::update(const IMUData &data, int64_t timestamp_us)
 {
     if (m_last_timestamp == 0) {
         m_last_timestamp = timestamp_us;
@@ -47,8 +47,8 @@ void ComplementaryFilter::update(float gx, float gy, float gz, float ax, float a
     float dt = (timestamp_us - m_last_timestamp) / MS2SEC;
     m_last_timestamp = timestamp_us;
 
-    apply_gyro_influence(gx, gy, gz, dt);
-    apply_accel_influence(ax, ay, az, dt);
+    apply_gyro_influence(data.gx, data.gy, data.gz, dt);
+    apply_accel_influence(data.ax, data.ay, data.az, dt);
 }
 
 void ComplementaryFilter::apply_gyro_influence(float gx, float gy, float gz, float dt)

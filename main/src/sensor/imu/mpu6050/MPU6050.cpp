@@ -53,6 +53,11 @@ const char *MPU6050::get_name() const noexcept
     return "[MPU6050]";
 }
 
+IMUData MPU6050::get_data()
+{
+    return {read_gx(), read_gy(), read_gz(), read_ax(), read_ay(), read_az()};
+}
+
 float MPU6050::read_ax() const
 {
     auto raw = get_raw_value(REG_AX_H);

@@ -17,10 +17,14 @@
 #include "pch.hpp"
 #include "FlightController.hpp"
 
+#include "MotorFactory.hpp"
+
 namespace kopter {
 
-static constexpr float BASE_THROTTLE = 0.8f;
-static constexpr std::string_view TAG = "[FC]";
+namespace {
+constexpr float BASE_THROTTLE = 0.5f;
+constexpr std::string_view TAG = "[FC]";
+} // namespace
 
 FlightController::FlightController(std::unique_ptr<IMU> imu,
                                    std::unique_ptr<IBarometer> barometer,
@@ -39,40 +43,54 @@ FlightController::FlightController(std::unique_ptr<IMU> imu,
       m_pid_yaw{pid_yaw ? std::move(pid_yaw) : std::make_unique<PID>()},
       m_pid_altitude{pid_altitude ? std::move(pid_altitude) : std::make_unique<PID>()}
 {
+    auto &motor_factory = MotorFactory::get_instance();
+    m_motors = {motor_factory.make_bdc_motor(GPIO_NUM_1, LEDC_CHANNEL_0),
+                motor_factory.make_bdc_motor(GPIO_NUM_20, LEDC_CHANNEL_1),
+                motor_factory.make_bdc_motor(GPIO_NUM_9, LEDC_CHANNEL_2),
+                motor_factory.make_bdc_motor(GPIO_NUM_7, LEDC_CHANNEL_3)};
 }
 
 void FlightController::update_speed(uint64_t micros)
 {
-    m_orientation_filter->update(m_imu->read_gx(),
-                                 m_imu->read_gy(),
-                                 m_imu->read_gz(),
-                                 m_imu->read_ax(),
-                                 m_imu->read_ay(),
-                                 m_imu->read_az(),
-                                 micros);
-
     glm::vec3 eulers = glm::eulerAngles(m_orientation_filter->get_quat());
-
     float roll = glm::degrees(eulers.x);
     float pitch = glm::degrees(eulers.y);
     float yaw = glm::degrees(eulers.z);
     float altitude = m_barometer->read_altitude();
 
-    float target_altitude = 400.0f;
+    if ((roll < -80 || roll > 80 || pitch < -80 || pitch > 80) &&
+        m_flight_mode != FlightMode::FAILSAFE) { // TODO Поправить
+        stop_motors();
+    }
 
-    float output_pitch, output_roll, output_yaw, output_altitude;
-    m_pid_roll->update(roll, output_roll);
-    m_pid_pitch->update(pitch, output_pitch);
-    m_pid_yaw->update(yaw, output_yaw);
-    m_pid_altitude->update(target_altitude - altitude, output_altitude);
+    if (m_flight_mode == FlightMode::STABILIZE) {
+        m_orientation_filter->update(m_imu->get_data(), micros);
 
-    float throttles[4] = {};
-    const MotorMixerConfig cfg{.throttles = throttles,
-                               .collective_throttle = BASE_THROTTLE,
-                               .roll = output_roll,
-                               .pitch = output_pitch,
-                               .yaw = output_yaw};
-    m_motor_mixer->mix(cfg);
+        // if (!m_roll_autotuner.is_finished()) {
+        //     m_roll_autotuner.update(pitch, micros);
+        //     float p = m_roll_autotuner.current_p();
+        //     m_pid_roll->set_kp(p);
+        //     //ESP_LOGI("Autotune", "P=%.3f", p);
+        // }
+        // else {
+        //     // Используем оптимальный P для дальнейшей работы
+        //     m_pid_roll->set_kp(m_roll_autotuner.get_tuned_p());
+        //     //ESP_LOGI("Autotune", "P=%.3f", m_roll_autotuner.get_tuned_p());
+        // }
+
+        float output_pitch, output_roll, output_yaw, output_altitude;
+        m_pid_roll->update(roll, output_roll);
+        m_pid_pitch->update(pitch, output_pitch);
+        m_pid_yaw->update(yaw, output_yaw);
+        m_pid_altitude->update(altitude, output_altitude);
+
+        float throttles[4] = {BASE_THROTTLE, BASE_THROTTLE, BASE_THROTTLE, BASE_THROTTLE};
+        const MotorMixerConfig cfg{.throttles = throttles,
+                                   .collective_throttle = BASE_THROTTLE,
+                                   .roll = output_roll,
+                                   .pitch = output_pitch,
+                                   .yaw = output_yaw};
+        m_motor_mixer->mix(cfg);
 
     m_motors[0]->set_speed(throttles[0]);
     m_motors[1]->set_speed(throttles[1]);

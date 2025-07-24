@@ -58,12 +58,20 @@ public:
     const char *get_name() const noexcept override;
 
     /**
+     * @brief Reads and returns sensor data.
+     *
+     * @return An instance of IMUData with mapped acceleration and angular velocity.
+     */
+    IMUData get_data() override;
+
+private:
+    /**
      * @brief Reads the acceleration value along the X axis.
      * @return Acceleration in g.
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    float read_ax() const override;
+    float read_ax() const;
 
     /**
      * @brief Reads the acceleration value along the Y axis.
@@ -71,7 +79,7 @@ public:
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    float read_ay() const override;
+    float read_ay() const;
 
     /**
      * @brief Reads the acceleration value along the Z axis.
@@ -79,7 +87,7 @@ public:
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    float read_az() const override;
+    float read_az() const;
 
     /**
      * @brief Reads the gyroscope value around the X axis.
@@ -87,7 +95,7 @@ public:
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    float read_gx() const override;
+    float read_gx() const;
 
     /**
      * @brief Reads the gyroscope value around the Y axis.
@@ -95,7 +103,7 @@ public:
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    float read_gy() const override;
+    float read_gy() const;
 
     /**
      * @brief Reads the gyroscope value around the Z axis.
@@ -103,9 +111,8 @@ public:
      *
      * @throws I2cException with the corrsponding esp_err_t return value if something goes wrong
      */
-    float read_gz() const override;
+    float read_gz() const;
 
-private:
     /**
      * @brief Reads raw 16-bit sensor data from the specified register.
      *
@@ -129,7 +136,10 @@ private:
      */
     void set_config();
 
+    /// I2C communication interface for MPU6050.
     std::unique_ptr<I2cDevice> m_i2c_device;
+
+    /// Mapper to convert raw sensor values to physical units.
     std::unique_ptr<MPU6050Mapper> m_mapper;
 };
 

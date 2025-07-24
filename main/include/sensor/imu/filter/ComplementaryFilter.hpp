@@ -50,18 +50,13 @@ public:
     /**
      * @brief Updates the orientation estimate using IMU data and timestamp.
      *
-     * @param gx Angular velocity around X axis in degrees per second.
-     * @param gy Angular velocity around Y axis in degrees per second.
-     * @param gz Angular velocity around Z axis in degrees per second.
-     * @param ax Acceleration along X axis in m/s².
-     * @param ay Acceleration along Y axis in m/s².
-     * @param az Acceleration along Z axis in m/s².
+     * @param data IMUData structure containing angular velocities and linear accelerations.
      * @param timestamp_us Timestamp of the current sample in microseconds.
      *
-     * @note The first call initializes the timestamp and skips computation.
-     * @note Accelerometer must be calibrated to give gravity-only when the device is stationary.
+     * @note The first call initializes the filter and skips integration.
+     * @note Accelerometer input must represent gravity-only for accurate correction.
      */
-    void update(float gx, float gy, float gz, float ax, float ay, float az, int64_t timestamp_us) override;
+    void update(const IMUData &data, int64_t timestamp_us) override;
 
 private:
     /**
@@ -88,8 +83,13 @@ private:
      */
     void apply_accel_influence(float ax, float ay, float az, float dt);
 
+    /// Blending factor between gyroscope integration and accelerometer correction.
     float m_alpha;
+
+    /// Timestamp of the last update in microseconds.
     int64_t m_last_timestamp;
+
+    /// Current orientation estimate represented as a quaternion.
     glm::quat m_quat;
 };
 
