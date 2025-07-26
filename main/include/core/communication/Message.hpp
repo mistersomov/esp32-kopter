@@ -19,12 +19,7 @@
 namespace kopter {
 
 /**
- * @struct Message
  * @brief Compact fixed-size message suitable for binary communication over UART, ESP-NOW, etc.
- *
- * Structure layout (packed, 22 bytes total):
- * - device_tag[20]: null-terminated ASCII identifier (e.g., "MTR1")
- * - data: 16-bit signed integer payload
  */
 struct [[gnu::packed]] Message {
 

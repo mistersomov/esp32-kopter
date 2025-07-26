@@ -17,25 +17,27 @@
 #include "pch.hpp"
 #include "Message.hpp"
 
+#include <cstring>
+
 namespace kopter {
 
 Message Message::deserialize(const uint8_t *buffer)
 {
+    assert(buffer);
+
     Message message;
-    std::copy(buffer, buffer + sizeof(message.device_tag), reinterpret_cast<uint8_t *>(&message.device_tag));
-    std::copy(buffer + sizeof(message.device_tag), buffer + size(), reinterpret_cast<uint8_t *>(&message.data));
+    std::memcpy(message.device_tag, buffer, sizeof(message.device_tag));
+    std::memcpy(&message.data, buffer + sizeof(message.device_tag), sizeof(message.data));
 
     return message;
 }
 
 void Message::serialize(uint8_t *buffer) const
 {
-    std::copy(reinterpret_cast<const uint8_t *>(&device_tag),
-              reinterpret_cast<const uint8_t *>(&device_tag) + sizeof(device_tag),
-              buffer);
-    std::copy(reinterpret_cast<const uint8_t *>(&data),
-              reinterpret_cast<const uint8_t *>(&data) + sizeof(data),
-              buffer + sizeof(device_tag));
+    assert(buffer);
+
+    std::memcpy(buffer, device_tag, sizeof(device_tag));
+    std::memcpy(buffer + sizeof(device_tag), &data, sizeof(data));
 }
 
 } // namespace kopter
