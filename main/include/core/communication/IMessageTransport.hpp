@@ -18,15 +18,12 @@
 
 #include "Message.hpp"
 
-#include <functional>
-
 namespace kopter {
 
 /**
  * @brief Interface for message transport layers.
  *
- * `IMessageTransport` is an abstract base class that provides an interface
- * for sending serialized messages to a target device specified by its MAC address.
+ * `IMessageTransport` is an abstract base class that provides an interface for sending serialized messages.
  * Implementations of this interface handle the actual data transmission,
  * allowing the application logic to remain protocol-agnostic.
  */
@@ -39,9 +36,8 @@ struct IMessageTransport {
     /**
      * @brief Sends a serialized message to a remote device.
      *
-     * @param mac_addr The MAC address of the target device.
      * @param message The message to send.
      */
-    virtual void send(const uint8_t *mac_addr, const Message &message) = 0;
+    virtual void send(const Message &message) = 0;
 };
 } // namespace kopter
