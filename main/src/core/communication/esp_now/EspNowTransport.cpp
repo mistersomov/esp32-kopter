@@ -19,6 +19,8 @@
 
 #include "MessageException.hpp"
 
+#include <cstring>
+
 namespace kopter {
 
 namespace {
@@ -26,24 +28,35 @@ constexpr uint8_t CHANNEL = CONFIG_WIFI_AP_CHANNEL;
 constexpr std::string_view TAG = "[EspNowTransport]";
 } // namespace
 
-EspNowTransport::EspNowTransport(std::array<uint8_t, ESP_NOW_ETH_ALEN> mac) : m_dest_mac{mac}
+EspNowTransport *EspNowTransport::s_instance = nullptr;
+std::atomic<uint32_t> EspNowTransport::s_rx_queue_null_count = 0;
+std::atomic<uint32_t> EspNowTransport::s_rx_data_null_count = 0;
+std::atomic<uint32_t> EspNowTransport::s_rx_len_invalid_count = 0;
+
+EspNowTransport::EspNowTransport(QueueHandle_t rx_queue, const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac)
+    : m_rx_queue{rx_queue}, m_dest_mac{std::move(mac)}
 {
+    s_instance = this;
+
     try {
         check_call<KopterException>(esp_now_init());
+        check_call<KopterException>(esp_now_register_recv_cb(&EspNowTransport::on_receive_cb));
         check_call<KopterException>(add_peer_to_list());
     }
     catch (const KopterException &e) {
-        ESP_LOGE(TAG.data(), "ESP-NOW initialization failed.");
+        ESP_LOGE(TAG.data(), "Init failed: %s", e.what());
     }
 }
 
 EspNowTransport::~EspNowTransport()
 {
+    s_instance = nullptr;
+
     try {
         check_call<KopterException>(esp_now_deinit());
     }
     catch (const KopterException &e) {
-        ESP_LOGE(TAG.data(), "ESP-NOW destroying failed.");
+        ESP_LOGE(TAG.data(), "ESP-NOW destroying failed: %s", e.what());
     }
 }
 
@@ -53,6 +66,57 @@ void EspNowTransport::send(const Message &message)
 
     message.serialize(buffer.data());
     check_call<MessageException>(esp_now_send(m_dest_mac.data(), buffer.data(), sizeof(buffer)));
+}
+
+void EspNowTransport::log_receive_errors()
+{
+    uint32_t queue_null = s_rx_queue_null_count;
+    uint32_t data_null = s_rx_data_null_count;
+    uint32_t len_invalid = s_rx_len_invalid_count;
+
+    if (queue_null) {
+        ESP_LOGW(TAG.data(), "Receive queue not initialized, dropped %u packets", queue_null);
+        s_rx_queue_null_count = 0;
+    }
+    if (data_null) {
+        ESP_LOGW(TAG.data(), "Received null data pointer, dropped %u packets", data_null);
+        s_rx_data_null_count = 0;
+    }
+    if (len_invalid) {
+        ESP_LOGW(TAG.data(), "Received invalid length data, dropped %u packets", len_invalid);
+        s_rx_len_invalid_count = 0;
+    }
+}
+
+void IRAM_ATTR EspNowTransport::on_receive_cb(const esp_now_recv_info_t *esp_now_info,
+                                              const uint8_t *data,
+                                              int data_len)
+{
+    if (!s_instance) {
+        return;
+    }
+
+    auto *queue = s_instance->m_rx_queue;
+
+    if (!queue) {
+        ++s_rx_queue_null_count;
+        return;
+    }
+    if (!data) {
+        ++s_rx_data_null_count;
+        return;
+    }
+    if (data_len <= 0) {
+        ++s_rx_len_invalid_count;
+        return;
+    }
+
+    std::array<uint8_t, Message::size()> buff{};
+    std::memcpy(buff.data(), data, std::min(static_cast<size_t>(data_len), buff.size()));
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xQueueSendFromISR(queue, &buff, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 esp_err_t EspNowTransport::add_peer_to_list() const
