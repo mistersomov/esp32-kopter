@@ -19,7 +19,6 @@
 #include "IMessageTransport.hpp"
 
 #include "esp_now.h"
-#include "freertos/queue.h"
 
 namespace kopter {
 
@@ -60,15 +59,7 @@ public:
      */
     void send(const Message &message) override;
 
-    /**
-     * @brief Attaches a receive queue for incoming messages.
-     *
-     * The transport uses this FreeRTOS queue to push received data from the ISR context.
-     * Ownership is not transferred; the caller is responsible for queue lifetime.
-     *
-     * @param rx_queue A FreeRTOS queue handle for incoming messages (must match `Message` size).
-     */
-    void attach_rx_queue(QueueHandle_t rx_queue);
+    void attach_rx_queue(QueueHandle_t rx_queue) override;
 
 private:
     /**

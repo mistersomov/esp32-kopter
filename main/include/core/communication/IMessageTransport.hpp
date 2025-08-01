@@ -18,6 +18,8 @@
 
 #include "Message.hpp"
 
+#include "freertos/queue.h"
+
 namespace kopter {
 
 /**
@@ -39,5 +41,21 @@ struct IMessageTransport {
      * @param message The message to send.
      */
     virtual void send(const Message &message) = 0;
+
+    /**
+     * @brief Optional hook for attaching an RX queue to receive messages from ISR.
+     *
+     * Some transport implementations (e.g., ESP-NOW) may rely on FreeRTOS queues
+     * to pass received data from the interrupt context into application-level tasks.
+     *
+     * This default implementation does nothing. Transports that require it
+     * should override this method to store the queue handle and push received
+     * message buffers into it from ISR callbacks.
+     *
+     * @param rx_queue A handle to a FreeRTOS queue for message reception.
+     */
+    virtual void attach_rx_queue(QueueHandle_t rx_queue)
+    {
+    }
 };
 } // namespace kopter
