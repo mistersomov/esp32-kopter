@@ -21,8 +21,6 @@
 #include "esp_now.h"
 #include "freertos/queue.h"
 
-#include <atomic>
-
 namespace kopter {
 
 /**
@@ -37,12 +35,11 @@ namespace kopter {
 class EspNowTransport : public IMessageTransport {
 public:
     /**
-     * @brief Constructs the transport with a destination MAC address and an externally managed queue.
+     * @brief Constructs the transport with a destination MAC address.
      *
-     * @param rx_queue Queue where received messages will be pushed (from ISR).
      * @param mac Destination MAC address for sending messages.
      */
-    EspNowTransport(QueueHandle_t rx_queue, const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac);
+    EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac);
 
     /**
      * @brief Dtor for EspNowTransport.
@@ -64,10 +61,14 @@ public:
     void send(const Message &message) override;
 
     /**
-     * @brief Logs receive-related errors (e.g., null queue or data, invalid length).
-     * Should be called periodically from a non-ISR context.
+     * @brief Attaches a receive queue for incoming messages.
+     *
+     * The transport uses this FreeRTOS queue to push received data from the ISR context.
+     * Ownership is not transferred; the caller is responsible for queue lifetime.
+     *
+     * @param rx_queue A FreeRTOS queue handle for incoming messages (must match `Message` size).
      */
-    void log_receive_errors();
+    void attach_rx_queue(QueueHandle_t rx_queue);
 
 private:
     /**
@@ -85,12 +86,20 @@ private:
      */
     [[nodiscard]] esp_err_t add_peer_to_list() const;
 
+    /**
+     * @brief Queue for receiving messages.
+     */
     QueueHandle_t m_rx_queue;
+
+    /**
+     * @brief Target MAC address for sending.
+     */
     std::array<uint8_t, ESP_NOW_ETH_ALEN> m_dest_mac;
+
+    /**
+     * @brief Static instance for ISR access.
+     */
     static EspNowTransport *s_instance;
-    static std::atomic<uint32_t> s_rx_queue_null_count;
-    static std::atomic<uint32_t> s_rx_data_null_count;
-    static std::atomic<uint32_t> s_rx_len_invalid_count;
 };
 
 } // namespace kopter

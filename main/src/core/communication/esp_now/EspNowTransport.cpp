@@ -29,12 +29,8 @@ constexpr std::string_view TAG = "[EspNowTransport]";
 } // namespace
 
 EspNowTransport *EspNowTransport::s_instance = nullptr;
-std::atomic<uint32_t> EspNowTransport::s_rx_queue_null_count = 0;
-std::atomic<uint32_t> EspNowTransport::s_rx_data_null_count = 0;
-std::atomic<uint32_t> EspNowTransport::s_rx_len_invalid_count = 0;
 
-EspNowTransport::EspNowTransport(QueueHandle_t rx_queue, const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac)
-    : m_rx_queue{rx_queue}, m_dest_mac{std::move(mac)}
+EspNowTransport::EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac) : m_dest_mac{std::move(mac)}
 {
     s_instance = this;
 
@@ -68,46 +64,16 @@ void EspNowTransport::send(const Message &message)
     check_call<MessageException>(esp_now_send(m_dest_mac.data(), buffer.data(), sizeof(buffer)));
 }
 
-void EspNowTransport::log_receive_errors()
+void EspNowTransport::attach_rx_queue(QueueHandle_t rx_queue)
 {
-    uint32_t queue_null = s_rx_queue_null_count;
-    uint32_t data_null = s_rx_data_null_count;
-    uint32_t len_invalid = s_rx_len_invalid_count;
-
-    if (queue_null) {
-        ESP_LOGW(TAG.data(), "Receive queue not initialized, dropped %u packets", queue_null);
-        s_rx_queue_null_count = 0;
-    }
-    if (data_null) {
-        ESP_LOGW(TAG.data(), "Received null data pointer, dropped %u packets", data_null);
-        s_rx_data_null_count = 0;
-    }
-    if (len_invalid) {
-        ESP_LOGW(TAG.data(), "Received invalid length data, dropped %u packets", len_invalid);
-        s_rx_len_invalid_count = 0;
-    }
+    m_rx_queue = rx_queue;
 }
 
 void IRAM_ATTR EspNowTransport::on_receive_cb(const esp_now_recv_info_t *esp_now_info,
                                               const uint8_t *data,
                                               int data_len)
 {
-    if (!s_instance) {
-        return;
-    }
-
-    auto *queue = s_instance->m_rx_queue;
-
-    if (!queue) {
-        ++s_rx_queue_null_count;
-        return;
-    }
-    if (!data) {
-        ++s_rx_data_null_count;
-        return;
-    }
-    if (data_len <= 0) {
-        ++s_rx_len_invalid_count;
+    if (!s_instance || !s_instance->m_rx_queue || !data || data_len <= 0) {
         return;
     }
 
@@ -115,7 +81,7 @@ void IRAM_ATTR EspNowTransport::on_receive_cb(const esp_now_recv_info_t *esp_now
     std::memcpy(buff.data(), data, std::min(static_cast<size_t>(data_len), buff.size()));
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xQueueSendFromISR(queue, &buff, &xHigherPriorityTaskWoken);
+    xQueueSendFromISR(s_instance->m_rx_queue, &buff, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
