@@ -31,7 +31,7 @@ namespace kopter {
  */
 struct IMU : public IDevice {
     /**
-     * @brief Ctor an IMU device with the given name.
+     * @brief Ctor an IMU device.
      */
     IMU();
 
