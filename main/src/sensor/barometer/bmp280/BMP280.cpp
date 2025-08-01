@@ -90,18 +90,18 @@ void BMP280::set_config()
 void BMP280::set_calib_data()
 {
     auto result = m_i2c_device->read(CALIB_UPPER_BYTE, CALIB_BYTES);
-    m_calib->dig_T1 = ByteUtils::get_u16(result[0], result[1]);
-    m_calib->dig_T2 = ByteUtils::get_s16(result[2], result[3]);
-    m_calib->dig_T3 = ByteUtils::get_s16(result[4], result[5]);
-    m_calib->dig_P1 = ByteUtils::get_u16(result[6], result[7]);
-    m_calib->dig_P2 = ByteUtils::get_s16(result[8], result[9]);
-    m_calib->dig_P3 = ByteUtils::get_s16(result[10], result[11]);
-    m_calib->dig_P4 = ByteUtils::get_s16(result[12], result[13]);
-    m_calib->dig_P5 = ByteUtils::get_s16(result[14], result[15]);
-    m_calib->dig_P6 = ByteUtils::get_s16(result[16], result[17]);
-    m_calib->dig_P7 = ByteUtils::get_s16(result[18], result[19]);
-    m_calib->dig_P8 = ByteUtils::get_s16(result[20], result[21]);
-    m_calib->dig_P9 = ByteUtils::get_s16(result[22], result[23]);
+    m_calib->dig_T1 = ByteUtils::get_u16_le(result[0], result[1]);
+    m_calib->dig_T2 = ByteUtils::get_s16_le(result[2], result[3]);
+    m_calib->dig_T3 = ByteUtils::get_s16_le(result[4], result[5]);
+    m_calib->dig_P1 = ByteUtils::get_u16_le(result[6], result[7]);
+    m_calib->dig_P2 = ByteUtils::get_s16_le(result[8], result[9]);
+    m_calib->dig_P3 = ByteUtils::get_s16_le(result[10], result[11]);
+    m_calib->dig_P4 = ByteUtils::get_s16_le(result[12], result[13]);
+    m_calib->dig_P5 = ByteUtils::get_s16_le(result[14], result[15]);
+    m_calib->dig_P6 = ByteUtils::get_s16_le(result[16], result[17]);
+    m_calib->dig_P7 = ByteUtils::get_s16_le(result[18], result[19]);
+    m_calib->dig_P8 = ByteUtils::get_s16_le(result[20], result[21]);
+    m_calib->dig_P9 = ByteUtils::get_s16_le(result[22], result[23]);
 }
 
 } // namespace kopter
