@@ -58,39 +58,21 @@ void FlightController::update_speed(uint64_t micros)
     float yaw = glm::degrees(eulers.z);
     float altitude = m_barometer->read_altitude();
 
-    if ((roll < -80 || roll > 80 || pitch < -80 || pitch > 80) &&
-        m_flight_mode != FlightMode::FAILSAFE) { // TODO Поправить
-        stop_motors();
-    }
+    m_orientation_filter->update(m_imu->get_data(), micros);
 
-    if (m_flight_mode == FlightMode::STABILIZE) {
-        m_orientation_filter->update(m_imu->get_data(), micros);
+    float output_pitch, output_roll, output_yaw, output_altitude;
+    m_pid_roll->update(roll, output_roll);
+    m_pid_pitch->update(pitch, output_pitch);
+    m_pid_yaw->update(yaw, output_yaw);
+    m_pid_altitude->update(altitude, output_altitude);
 
-        // if (!m_roll_autotuner.is_finished()) {
-        //     m_roll_autotuner.update(pitch, micros);
-        //     float p = m_roll_autotuner.current_p();
-        //     m_pid_roll->set_kp(p);
-        //     //ESP_LOGI("Autotune", "P=%.3f", p);
-        // }
-        // else {
-        //     // Используем оптимальный P для дальнейшей работы
-        //     m_pid_roll->set_kp(m_roll_autotuner.get_tuned_p());
-        //     //ESP_LOGI("Autotune", "P=%.3f", m_roll_autotuner.get_tuned_p());
-        // }
-
-        float output_pitch, output_roll, output_yaw, output_altitude;
-        m_pid_roll->update(roll, output_roll);
-        m_pid_pitch->update(pitch, output_pitch);
-        m_pid_yaw->update(yaw, output_yaw);
-        m_pid_altitude->update(altitude, output_altitude);
-
-        float throttles[4] = {BASE_THROTTLE, BASE_THROTTLE, BASE_THROTTLE, BASE_THROTTLE};
-        const MotorMixerConfig cfg{.throttles = throttles,
-                                   .collective_throttle = BASE_THROTTLE,
-                                   .roll = output_roll,
-                                   .pitch = output_pitch,
-                                   .yaw = output_yaw};
-        m_motor_mixer->mix(cfg);
+    float throttles[4] = {BASE_THROTTLE, BASE_THROTTLE, BASE_THROTTLE, BASE_THROTTLE};
+    const MotorMixerConfig cfg{.throttles = throttles,
+                               .collective_throttle = BASE_THROTTLE,
+                               .roll = output_roll,
+                               .pitch = output_pitch,
+                               .yaw = output_yaw};
+    m_motor_mixer->mix(cfg);
 
     m_motors[0]->set_speed(throttles[0]);
     m_motors[1]->set_speed(throttles[1]);

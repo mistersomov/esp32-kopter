@@ -43,19 +43,19 @@ PID::PID(float kp, float ki, float kd, float target_point) : m_target_point{targ
     pid_ctrl_config_t pid_config{};
     pid_config.init_param = pid_runtime_param;
 
-    check_call<PIDException>([&]() { pid_new_control_block(&pid_config, &m_pid); });
+    check_call<PIDException>(pid_new_control_block(&pid_config, &m_pid));
 }
 
 PID::~PID()
 {
     if (m_pid) {
-        check_call<PIDException>([this]() { pid_del_control_block(m_pid); });
+        check_call<PIDException>(pid_del_control_block(m_pid));
     }
 }
 
 void PID::update(float current, float &output)
 {
-    check_call<PIDException>([&]() { pid_compute(m_pid, m_target_point - current, &output); });
+    check_call<PIDException>(pid_compute(m_pid, m_target_point - current, &output));
 }
 
 void PID::set_target_point(float value) noexcept
