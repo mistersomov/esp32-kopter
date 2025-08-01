@@ -24,11 +24,13 @@ set(includedirs
         "include/motor/mixer"
         "include/ota"
         "include/pid"
+        "include/rc"
         "include/sensor/barometer"
         "include/sensor/barometer/bmp280"
         "include/sensor/imu"
         "include/sensor/imu/filter"
         "include/sensor/imu/mpu6050"
+        "include/server"
 )
 set(srcdirs 
         "src"
@@ -39,6 +41,7 @@ set(srcdirs
         "src/core/network"
         "src/core/peripheral/adc"
         "src/core/peripheral/i2c"
+        "src/core/utils"
         "src/fc"
         "src/led"
         "src/motor"
@@ -46,17 +49,20 @@ set(srcdirs
         "src/motor/mixer"
         "src/ota"
         "src/pid"
+        "src/rc"
         "src/sensor/barometer"
         "src/sensor/barometer/bmp280"
         "src/sensor/imu"
         "src/sensor/imu/filter"
         "src/sensor/imu/mpu6050"
+        "src/server"
 )
 set(reqs
         esp_adc
         esp_driver_gpio
         esp_driver_ledc
         esp_event
+        esp_http_server
         esp_https_ota
         esp_netif
         esp_wifi
