@@ -19,32 +19,76 @@
 namespace kopter {
 
 /**
+ * @brief Represents the type of message being transmitted.
+ */
+enum class MessageType : uint8_t {
+    /** Message to request data (e.g. telemetry).*/
+    READ,
+
+    /** Message to send control data (e.g. motor commands).*/
+    WRITE
+};
+
+/**
  * @brief Compact fixed-size message suitable for binary communication over UART, ESP-NOW, etc.
+ *
+ * This structure is packed and meant to be serialized into a raw byte buffer for transmission,
+ * or deserialized from such buffer. It contains essential fields for drone control or telemetry exchange.
  */
 struct [[gnu::packed]] Message {
 
-    /// Total serialized message size in bytes.
-    static constexpr size_t size() noexcept
+    /**
+     * @brief Size of the serialized message in bytes.
+     */
+    static constexpr size_t size()
     {
-        return sizeof(device_tag) + sizeof(int16_t);
-    };
+        return sizeof(MessageType) + sizeof(throttle) + sizeof(roll) + sizeof(pitch) + sizeof(yaw) + sizeof(crc);
+    }
 
     /**
      * @brief Creates a Message instance from a raw byte buffer.
+     *
      * @param buffer Pointer to bytes of data.
      * @return Deserialized Message object.
      */
-    static Message deserialize(const uint8_t *buffer);
+    static std::optional<Message> deserialize(const uint8_t *buffer);
 
     /**
      * @brief Serializes the message into a raw byte buffer.
+     *
      * @param buffer Pointer to a buffer.
      */
     void serialize(uint8_t *buffer) const;
 
-    static constexpr size_t TAG_SIZE = 20;
-    char device_tag[TAG_SIZE];
-    int16_t data;
+    /**
+     * @brief Type of the message (e.g. READ or WRITE).
+     */
+    MessageType type;
+
+    /**
+     * @brief Throttle value, typically mapped from user input.
+     */
+    uint8_t throttle;
+
+    /**
+     * @brief Roll value, e.g. left/right tilt.
+     */
+    int8_t roll;
+
+    /**
+     * @brief Pitch value, e.g. forward/backward tilt.
+     */
+    int8_t pitch;
+
+    /**
+     * @brief Yaw value, e.g. rotation around vertical axis.
+     */
+    int8_t yaw;
+
+    /**
+     * @brief CRC16 checksum calculated over the remaining fields of the message.
+     */
+    uint16_t crc;
 };
 
 } // namespace kopter
