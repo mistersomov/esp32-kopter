@@ -48,5 +48,21 @@ struct JSONParser {
      * @param object JSON object.
      */
     static void delete_json(cJSON *object) noexcept;
+
+    /**
+     * @brief Checks whether a given cJSON object represents a numeric value.
+     *
+     * @param object The cJSON object to check.
+     * @return `true` if the object is a number, `false` otherwise.
+     */
+    static bool is_number(const cJSON *object) noexcept;
+
+    /**
+     * @brief Checks whether a given cJSON object represents a string value.
+     *
+     * @param object The cJSON object to check.
+     * @return `true` if the object is a string, `false` otherwise.
+     */
+    static bool is_string(const cJSON *object) noexcept;
 };
 } // namespace kopter

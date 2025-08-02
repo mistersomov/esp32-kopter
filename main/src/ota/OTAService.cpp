@@ -17,8 +17,10 @@
 #include "pch.hpp"
 #include "OTAService.hpp"
 
+#include "EventService.hpp"
 #include "FirmwareService.hpp"
 #include "JSONParser.hpp"
+#include "OTAEvent.hpp"
 #include "Task.hpp"
 
 #include "esp_crt_bundle.h"
@@ -57,6 +59,7 @@ void OTAService::check_and_update()
     }
     else {
         ESP_LOGI(TAG.data(), "Already up-to-date.");
+        EventService::get_instance().post_event(OTA_SKIP_EVENT);
     }
 }
 
@@ -110,16 +113,17 @@ esp_err_t OTAService::fill_meta_info(const std::vector<char> &buffer)
     auto version = JSONParser::get_json_by_name(json, "version");
     auto url = JSONParser::get_json_by_name(json, "url");
 
-    if (!(cJSON_IsNumber(version) && cJSON_IsString(url) && (url->valuestring != nullptr))) {
-        ESP_LOGE(TAG.data(), "Invalid JSON structure. Content: %s", buffer.data());
-        cJSON_Delete(json);
-        return ESP_ERR_INVALID_RESPONSE;
-    }
+    if (!JSONParser::is_number(version) && JSONParser::is_string(url) && (url->valuestring != nullptr)))
+        {
+            ESP_LOGE(TAG.data(), "Invalid JSON structure. Content: %s", buffer.data());
+            JSONParser::delete_json(json);
+            return ESP_ERR_INVALID_RESPONSE;
+        }
 
     m_meta_info.url = std::string(url->valuestring);
     m_meta_info.version = static_cast<uint16_t>(version->valueint);
 
-    cJSON_Delete(json);
+    JSONParser::delete_json(json);
 
     return ESP_OK;
 }

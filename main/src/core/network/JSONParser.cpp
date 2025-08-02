@@ -48,4 +48,14 @@ void JSONParser::delete_json(cJSON *object) noexcept
     cJSON_Delete(object);
 }
 
+bool JSONParser::is_number(const cJSON *object) noexcept
+{
+    return cJSON_IsNumber(object);
+}
+
+bool JSONParser::is_string(const cJSON *object) noexcept
+{
+    return cJSON_IsString(object);
+}
+
 } // namespace kopter
