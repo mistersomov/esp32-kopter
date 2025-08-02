@@ -38,7 +38,7 @@ public:
      *
      * @param mac Destination MAC address for sending messages.
      */
-    EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac);
+    explicit EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac);
 
     /**
      * @brief Dtor for EspNowTransport.
