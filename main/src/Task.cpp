@@ -19,11 +19,17 @@
 
 namespace kopter {
 
-inline static constexpr uint8_t TASK_PRIORITY_DEFAULT = 5;
+namespace {
+constexpr uint8_t TASK_PRIORITY_DEFAULT = 5;
+} // namespace
 
 Task::Task(const char *task_name, uint32_t stack_size, TaskFn fn) : m_fn(std::move(fn))
 {
     xTaskCreate(Task::task_trampoline, task_name, stack_size, this, TASK_PRIORITY_DEFAULT, nullptr);
+}
+
+Task::Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, TaskFn fn)
+{
 }
 
 Task::Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, BaseType_t coreId, TaskFn fn)

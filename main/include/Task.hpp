@@ -23,6 +23,7 @@ public:
     using TaskFn = std::function<void()>;
 
     Task(const char *task_name, uint32_t stack_size, TaskFn fn);
+    Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, TaskFn fn);
     Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, BaseType_t coreId, TaskFn fn);
 
 private:
