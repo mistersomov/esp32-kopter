@@ -23,25 +23,24 @@ namespace kopter {
 
 namespace {
 constexpr float MAX_OUTPUT = 100.0f;
-constexpr float MIN_OUTPUT = 0.0f;
+constexpr float MIN_OUTPUT = -100.0f;
 constexpr float MAX_INTEGRAL = 1000.0f;
 constexpr float MIN_INTEGRAL = -1000.0f;
 } // namespace
 
 PID::PID(float kp, float ki, float kd, float target_point) : m_target_point{target_point}
 {
-    pid_ctrl_parameter_t pid_runtime_param{};
-    pid_runtime_param.kp = kp;
-    pid_runtime_param.ki = ki;
-    pid_runtime_param.kd = kd;
-    pid_runtime_param.cal_type = PID_CAL_TYPE_INCREMENTAL;
-    pid_runtime_param.max_output = MAX_OUTPUT;
-    pid_runtime_param.min_output = MIN_OUTPUT;
-    pid_runtime_param.max_integral = MAX_INTEGRAL;
-    pid_runtime_param.min_integral = MIN_INTEGRAL;
+    m_pid_runtime_param.kp = kp;
+    m_pid_runtime_param.ki = ki;
+    m_pid_runtime_param.kd = kd;
+    m_pid_runtime_param.cal_type = PID_CAL_TYPE_POSITIONAL;
+    m_pid_runtime_param.max_output = MAX_OUTPUT;
+    m_pid_runtime_param.min_output = MIN_OUTPUT;
+    m_pid_runtime_param.max_integral = MAX_INTEGRAL;
+    m_pid_runtime_param.min_integral = MIN_INTEGRAL;
 
     pid_ctrl_config_t pid_config{};
-    pid_config.init_param = pid_runtime_param;
+    pid_config.init_param = m_pid_runtime_param;
 
     check_call<PIDException>(pid_new_control_block(&pid_config, &m_pid));
 }
@@ -61,6 +60,24 @@ void PID::update(float current, float &output)
 void PID::set_target_point(float value) noexcept
 {
     m_target_point = value;
+}
+
+void PID::set_kp(float value)
+{
+    m_pid_runtime_param.kp = value;
+    check_call<PIDException>(pid_update_parameters(m_pid, &m_pid_runtime_param));
+}
+
+void PID::set_ki(float value)
+{
+    m_pid_runtime_param.ki = value;
+    check_call<PIDException>(pid_update_parameters(m_pid, &m_pid_runtime_param));
+}
+
+void PID::set_kd(float value)
+{
+    m_pid_runtime_param.kd = value;
+    check_call<PIDException>(pid_update_parameters(m_pid, &m_pid_runtime_param));
 }
 
 } // namespace kopter

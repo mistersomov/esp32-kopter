@@ -52,7 +52,7 @@ public:
      *
      * @throws PIDException if the PID control block could not be created or initialized.
      */
-    explicit PID(float kp = 1.0f, float ki = 0.1f, float kd = 0.05f, float target_point = 0.0f);
+    explicit PID(float kp = 0.0f, float ki = 0.0f, float kd = 0.0f, float target_point = 0.0f);
 
     /**
      * Dtor with deleting a `pid_ctrl_block_handle_t` member.
@@ -81,8 +81,65 @@ public:
      */
     void set_target_point(float value) noexcept;
 
+    /**
+     * @brief Retrieves the proportional gain (Kp).
+     * @return Current Kp value.
+     */
+    constexpr float get_kp() const noexcept
+    {
+        return m_pid_runtime_param.kp;
+    }
+
+    /**
+     * @brief Sets the proportional gain (Kp).
+     * @param value New Kp value.
+     */
+    void set_kp(float value);
+
+    /**
+     * @brief Retrieves the integral gain (Ki).
+     * @return Current Ki value.
+     */
+    constexpr float get_ki() const noexcept
+    {
+        return m_pid_runtime_param.ki;
+    }
+
+    /**
+     * @brief Sets the integral gain (Ki).
+     * @param value New Ki value.
+     */
+    void set_ki(float value);
+
+    /**
+     * @brief Retrieves the derivative gain (Kd).
+     * @return Current Kd value.
+     */
+    constexpr float get_kd() const noexcept
+    {
+        return m_pid_runtime_param.kd;
+    }
+
+    /**
+     * @brief Sets the derivative gain (Kd).
+     * @param value New Kd value.
+     */
+    void set_kd(float value);
+
 private:
+    /**
+     * @brief Runtime tuning parameters (Kp, Ki, Kd).
+     */
+    pid_ctrl_parameter_t m_pid_runtime_param;
+
+    /**
+     * @brief Handle to the underlying ESP-IDF PID controller.
+     */
     pid_ctrl_block_handle_t m_pid;
+
+    /**
+     * @brief Desired setpoint value.
+     */
     float m_target_point;
 };
 
