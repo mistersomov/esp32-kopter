@@ -73,7 +73,7 @@ WiFiManager &WiFiManager::get_instance(EventService *p_event_service)
     return *instance;
 }
 
-void WiFiManager::init()
+void WiFiManager::init(wifi_mode_t mode)
 {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -84,7 +84,7 @@ void WiFiManager::init()
     check_call<WiFiException>(esp_netif_init());
 
     set_event_handler();
-    set_wifi_config();
+    set_wifi_config(mode);
     check_call<WiFiException>(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     check_call<WiFiException>(esp_wifi_start());
 }
@@ -94,13 +94,25 @@ bool WiFiManager::is_ssid_empty() const
     return WIFI_STA_SSID == nullptr || std::strlen(WIFI_STA_SSID) == 0;
 }
 
-void WiFiManager::set_wifi_config()
+void WiFiManager::set_wifi_config(wifi_mode_t mode)
 {
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
+
     check_call<WiFiException>(esp_wifi_init(&init_cfg));
-    check_call<WiFiException>(esp_wifi_set_mode(WIFI_MODE_APSTA));
+    check_call<WiFiException>(esp_wifi_set_mode(mode));
+
+    switch (mode) {
+    case WIFI_MODE_APSTA:
     set_wifi_ap_config();
     set_wifi_sta_config();
+        break;
+    case WIFI_MODE_AP:
+        set_wifi_ap_config();
+        break;
+    default:
+        set_wifi_sta_config();
+        break;
+    }
 }
 
 void WiFiManager::set_wifi_ap_config()

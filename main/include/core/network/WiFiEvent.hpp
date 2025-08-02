@@ -17,7 +17,8 @@
 #pragma once
 
 #include "esp_event_cxx.hpp"
-#include "esp_wifi.h"
+#include "esp_netif_types.h"
+#include "esp_wifi_types_generic.h"
 
 namespace kopter {
 
@@ -29,5 +30,9 @@ static const idf::event::ESPEvent STA_CONNECTED_EVENT =
     idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_STA_CONNECTED));
 static const idf::event::ESPEvent STA_DISCONNECTED_EVENT =
     idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_STA_DISCONNECTED));
+static const idf::event::ESPEvent APSTA_CONNECTED_EVENT =
+    idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_AP_STACONNECTED));
+static const idf::event::ESPEvent APSTA_DISCONNECTED_EVENT =
+    idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_AP_STADISCONNECTED));
 
 } // namespace kopter

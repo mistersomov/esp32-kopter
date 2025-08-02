@@ -19,13 +19,14 @@
 #include "WiFiEvent.hpp"
 
 #include "esp_netif.h"
+#include "esp_wifi.h"
 
 namespace kopter {
 
 class EventService;
 
 /**
- * @brief Singleton class for managing Wi-Fi in AP+STA mode using ESP-IDF.
+ * @brief Singleton class for managing Wi-Fi using ESP-IDF.
  *
  * This class initializes the Wi-Fi stack, configures both Access Point and Station modes,
  * and handles automatic reconnection and event registration.
@@ -51,13 +52,15 @@ public:
     static WiFiManager &get_instance(EventService *p_event_service);
 
     /**
-     * @brief Initializes and starts WiFi.
+     * @brief Initializes and starts Wi-Fi.
      *
-     * Initializes NVS, network interfaces, and starts Wi-Fi in APSTA mode.
+     * Initializes NVS, network interfaces, and starts Wi-Fi in specified mode.
+     *
+     * @param mode Wi-Fi mode type (APSTA, AP, STA).
      *
      * @throws WiFiException if initialization or Wi-Fi start fails.
      */
-    void init();
+    void init(wifi_mode_t mode);
 
     /**
      * @brief Checks SSID.
@@ -75,11 +78,13 @@ private:
     WiFiManager(EventService *p_event_service);
 
     /**
-     * @brief Initializes Wi-Fi and sets AP + STA configuration.
+     * @brief Initializes Wi-Fi configuration.
+     *
+     * @param mode Wi-Fi mode type (APSTA, AP, STA).
      *
      * @throws WiFiException if initialization or configuration fails.
      */
-    void set_wifi_config();
+    void set_wifi_config(wifi_mode_t mode);
 
     /**
      * @brief Configures Wi-Fi Access Point mode.
