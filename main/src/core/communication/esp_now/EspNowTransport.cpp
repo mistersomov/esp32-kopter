@@ -24,13 +24,13 @@
 namespace kopter {
 
 namespace {
-constexpr uint8_t CHANNEL = CONFIG_WIFI_AP_CHANNEL;
 constexpr std::string_view TAG = "[EspNowTransport]";
 } // namespace
 
 EspNowTransport *EspNowTransport::s_instance = nullptr;
 
-EspNowTransport::EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac) : m_dest_mac{std::move(mac)}
+EspNowTransport::EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac, uint8_t channel)
+    : m_dest_mac{std::move(mac)}, m_wifi_channel{channel}
 {
     s_instance = this;
 
@@ -77,19 +77,22 @@ void IRAM_ATTR EspNowTransport::on_receive_cb(const esp_now_recv_info_t *esp_now
         return;
     }
 
-    std::array<uint8_t, Message::size()> buff{};
-    std::memcpy(buff.data(), data, std::min(static_cast<size_t>(data_len), buff.size()));
+    auto msg_opt = Message::deserialize(data);
+    if (!msg_opt.has_value()) {
+        return;
+    }
 
+    auto *msg = new Message(std::move(msg_opt.value()));
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xQueueSendFromISR(s_instance->m_rx_queue, &buff, &xHigherPriorityTaskWoken);
+    xQueueSendFromISR(s_instance->m_rx_queue, &msg, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 esp_err_t EspNowTransport::add_peer_to_list() const
 {
     esp_now_peer_info peer_info{};
-    peer_info.channel = CHANNEL;
-    peer_info.ifidx = WIFI_IF_AP;
+    peer_info.channel = m_wifi_channel;
+    peer_info.ifidx = WIFI_IF_STA;
     peer_info.encrypt = false;
     std::copy(m_dest_mac.data(), m_dest_mac.data() + ESP_NOW_ETH_ALEN, peer_info.peer_addr);
 

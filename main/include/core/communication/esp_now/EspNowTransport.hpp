@@ -37,8 +37,9 @@ public:
      * @brief Constructs the transport with a destination MAC address.
      *
      * @param mac Destination MAC address for sending messages.
+     * @param wifi_channel Wi-Fi channel to associate with the ESP-NOW peer (must match active Wi-Fi channel).
      */
-    explicit EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac);
+    explicit EspNowTransport(const std::array<uint8_t, ESP_NOW_ETH_ALEN> &mac, uint8_t wifi_channel);
 
     /**
      * @brief Dtor for EspNowTransport.
@@ -86,6 +87,11 @@ private:
      * @brief Target MAC address for sending.
      */
     std::array<uint8_t, ESP_NOW_ETH_ALEN> m_dest_mac;
+
+    /**
+     * @brief Wi-Fi channel used by the ESP-NOW peer (must match current Wi-Fi channel).
+     */
+    uint8_t m_wifi_channel;
 
     /**
      * @brief Static instance for ISR access.
