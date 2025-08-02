@@ -30,9 +30,9 @@ static const idf::event::ESPEvent STA_CONNECTED_EVENT =
     idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_STA_CONNECTED));
 static const idf::event::ESPEvent STA_DISCONNECTED_EVENT =
     idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_STA_DISCONNECTED));
-static const idf::event::ESPEvent APSTA_CONNECTED_EVENT =
+static const idf::event::ESPEvent SOFT_STA_CONNECTED_EVENT =
     idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_AP_STACONNECTED));
-static const idf::event::ESPEvent APSTA_DISCONNECTED_EVENT =
+static const idf::event::ESPEvent SOFT_STA_DISCONNECTED_EVENT =
     idf::event::ESPEvent(WIFI_EVENT, idf::event::ESPEventID(WIFI_EVENT_AP_STADISCONNECTED));
 
 } // namespace kopter
