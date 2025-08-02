@@ -17,10 +17,8 @@
 #include "pch.hpp"
 #include "OTAService.hpp"
 
-#include "EventService.hpp"
 #include "FirmwareService.hpp"
 #include "JSONParser.hpp"
-#include "OTAEvent.hpp"
 #include "Task.hpp"
 
 #include "esp_crt_bundle.h"
@@ -59,7 +57,6 @@ void OTAService::check_and_update()
     }
     else {
         ESP_LOGI(TAG.data(), "Already up-to-date.");
-        EventService::get_instance().post_event(OTA_SKIP_EVENT);
     }
 }
 
