@@ -110,8 +110,7 @@ esp_err_t OTAService::fill_meta_info(const std::vector<char> &buffer)
     auto version = JSONParser::get_json_by_name(json, "version");
     auto url = JSONParser::get_json_by_name(json, "url");
 
-    if (!JSONParser::is_number(version) && JSONParser::is_string(url) && (url->valuestring != nullptr)))
-        {
+    if (!JSONParser::is_number(version) && JSONParser::is_string(url) && (url->valuestring != nullptr)) {
             ESP_LOGE(TAG.data(), "Invalid JSON structure. Content: %s", buffer.data());
             JSONParser::delete_json(json);
             return ESP_ERR_INVALID_RESPONSE;
