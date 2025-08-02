@@ -40,9 +40,8 @@ public:
      * and starts a background task for receiving messages.
      *
      * @param transport  Transport implementation for message I/O.
-     * @param rx_cb      Callback to invoke on message reception.
      */
-    explicit CommunicationService(std::unique_ptr<IMessageTransport> transport, RxCallback rx_cb);
+    explicit CommunicationService(std::unique_ptr<IMessageTransport> transport) noexcept;
     ~CommunicationService();
 
     /**
@@ -50,6 +49,8 @@ public:
      * @param msg Message to send.
      */
     void send_message(const Message &msg) const;
+
+    void set_rx_callback(RxCallback rx_cb) noexcept;
 
 private:
     /**

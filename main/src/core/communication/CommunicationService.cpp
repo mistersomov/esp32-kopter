@@ -28,8 +28,8 @@ constexpr std::string_view RX_MESSAGE_TASK_NAME = "msg_task";
 constexpr std::string_view TAG = "[MessageManager]";
 } // namespace
 
-CommunicationService::CommunicationService(std::unique_ptr<IMessageTransport> transport, RxCallback rx_cb)
-    : m_transport{std::move(transport)}, m_rx_queue{nullptr}, m_rx_cb{std::move(rx_cb)}
+CommunicationService::CommunicationService(std::unique_ptr<IMessageTransport> transport) noexcept
+    : m_transport{std::move(transport)}, m_rx_queue{nullptr}
 {
     m_rx_queue = xQueueCreate(RX_QUEUE_SIZE, sizeof(Message *));
     if (m_rx_queue == nullptr) {
@@ -57,6 +57,11 @@ void CommunicationService::send_message(const Message &msg) const
     catch (const MessageException &e) {
         ESP_LOGE(TAG.data(), "Failed to send message: %s", e.what());
     }
+}
+
+void CommunicationService::set_rx_callback(RxCallback rx_cb) noexcept
+{
+    m_rx_cb = rx_cb;
 }
 
 void CommunicationService::create_rx_task()
