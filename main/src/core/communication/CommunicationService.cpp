@@ -25,7 +25,7 @@ namespace {
 constexpr uint8_t RX_QUEUE_SIZE = 6;
 constexpr uint16_t RX_MESSAGE_TASK_STACK_SIZE = 4096;
 constexpr std::string_view RX_MESSAGE_TASK_NAME = "msg_task";
-constexpr std::string_view TAG = "[MessageManager]";
+constexpr std::string_view TAG = "[CommunicationService]";
 } // namespace
 
 CommunicationService::CommunicationService(std::unique_ptr<IMessageTransport> transport) noexcept
