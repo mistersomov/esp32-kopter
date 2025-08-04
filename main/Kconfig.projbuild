@@ -97,8 +97,7 @@ menu "Kopter Conifiguration"
             int "OTA Receive Timeout"
             default 5000
             help
-                Maximum time for reception
-
+                Maximum time for reception.
     endmenu
 
     config ENABLE_LONG_RANGE
@@ -111,12 +110,36 @@ menu "Kopter Conifiguration"
         int "SDA pin"
         default 21
         help
-            SDA pin for communicate by I2C bus
+            SDA pin for communicate by I2C bus.
             
     config I2C_SCL_PIN
         int "SCL pin"
         default 22
         help
-            SCL pin for communicate by I2C bus
+            SCL pin for communicate by I2C bus.
+
+    menu "LED configuration"
+        config ENABLE_RGB_LED
+            bool "Enable RGB LED"
+            default "n"
+            help
+                Allows to use a built-in RGB LED (e.g. WS2812).
+
+        config RGB_LED_PIN
+            depends on ENABLE_RGB_LED
+            int "RGB LED Pin"
+            default 8
+            help
+               The pin to which the RGB strip is connected.
+
+        config RGB_LED_NUM
+            depends on ENABLE_RGB_LED
+            int "Number of RGB LED"
+            range 1 20
+            default 1
+            help
+               The number of available RGB.
+    endmenu
+
 
 endmenu
