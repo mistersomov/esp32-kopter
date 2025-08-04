@@ -1,82 +1,90 @@
 menu "Kopter Conifiguration"
 
-    menu "SoftAP Configuration"
-        comment "SoftAP Configuration"
+    menu "Wi-Fi Configuration"
+        menu "SoftAP Configuration"
+            comment "SoftAP Configuration"
 
-        config WIFI_AP_SSID
-            string "WiFi AP SSID"
-            default "esp32-ap"
+            config WIFI_AP_SSID
+                string "WiFi AP SSID"
+                default "esp32-ap"
+                help
+                    SSID (network name) of the AP.
+
+            config WIFI_AP_PASSWORD
+                string "WiFi AP Password"
+                default "123"
+                help
+                    WiFi password of the AP.
+
+            config WIFI_AP_CHANNEL
+                int "WiFi AP Channel"
+                range 1 14
+                default 6
+                help
+                    WiFi channel (network channel) of the AP.
+
+            config MAX_STA_CONN_AP
+                int "Maximal STA connections"
+                default 1
+                help
+                    Max number of the STA connects to AP.
+        endmenu
+
+        menu "STA Configuration"
+            comment "STA Configuration"
+
+            config WIFI_REMOTE_AP_SSID
+                string "WiFi Remote AP SSID"
+                default ""
+                help
+                    SSID (network name) to connect to.
+
+            config WIFI_REMOTE_AP_PASSWORD
+                string "WiFi Remote AP Password"
+                default ""
+                help
+                    WiFi password.
+
+            config MAXIMUM_STA_RETRY
+                int "Maximum retry"
+                default 5
+                help
+                    Set the maximum retry value to prevent the station from continuously
+                    attempting to reconnect to the Access Point (AP) when the AP doesn't exist.
+
+            choice WIFI_SCAN_AUTH_MODE_THRESHOLD
+                prompt "WiFi Scan auth mode threshold"
+                default WIFI_AUTH_WPA2_PSK
+                help
+                    The weakest authmode to accept in the scan mode.
+                    This value defaults to ESP_WIFI_AUTH_WPA2_PSK in case password is present
+                    and ESP_WIFI_AUTH_OPEN is used. Please select ESP_WIFI_AUTH_WEP / ESP_WIFI_AUTH_WPA_PSK
+                    in case AP is operating in WEP / WPA mode.
+
+                config WIFI_AUTH_OPEN
+                    bool "OPEN"
+                config WIFI_AUTH_WEP
+                    bool "WEP"
+                config WIFI_AUTH_WPA_PSK
+                    bool "WPA PSK"
+                config WIFI_AUTH_WPA2_PSK
+                    bool "WPA2 PSK"
+                config WIFI_AUTH_WPA_WPA2_PSK
+                    bool "WPA/WPA2 PSK"
+                config WIFI_AUTH_WPA3_PSK
+                    bool "WPA3 PSK"
+                config WIFI_AUTH_WPA2_WPA3_PSK
+                    bool "WPA2/WPA3 PSK"
+                config WIFI_AUTH_WAPI_PSK
+                    bool "WAPI PSK"
+            endchoice
+        endmenu
+
+        config ENABLE_LONG_RANGE
+            bool "Enable Long Range"
+            default "n"
             help
-                SSID (network name) of the AP.
-
-        config WIFI_AP_PASSWORD
-            string "WiFi AP Password"
-            default "123"
-            help
-                WiFi password of the AP.
-
-        config WIFI_AP_CHANNEL
-            int "WiFi AP Channel"
-            range 1 14
-            default 6
-            help
-                WiFi channel (network channel) of the AP.
-
-        config MAX_STA_CONN_AP
-            int "Maximal STA connections"
-            default 1
-            help
-                Max number of the STA connects to AP.
-    endmenu
-
-    menu "STA Configuration"
-        comment "STA Configuration"
-
-        config WIFI_REMOTE_AP_SSID
-            string "WiFi Remote AP SSID"
-            default ""
-            help
-                SSID (network name) to connect to.
-
-        config WIFI_REMOTE_AP_PASSWORD
-            string "WiFi Remote AP Password"
-            default ""
-            help
-                WiFi password.
-
-        config MAXIMUM_STA_RETRY
-            int "Maximum retry"
-            default 5
-            help
-                Set the maximum retry value to prevent the station from continuously
-                attempting to reconnect to the Access Point (AP) when the AP doesn't exist.
-
-        choice WIFI_SCAN_AUTH_MODE_THRESHOLD
-            prompt "WiFi Scan auth mode threshold"
-            default WIFI_AUTH_WPA2_PSK
-            help
-                The weakest authmode to accept in the scan mode.
-                This value defaults to ESP_WIFI_AUTH_WPA2_PSK in case password is present
-                and ESP_WIFI_AUTH_OPEN is used. Please select ESP_WIFI_AUTH_WEP / ESP_WIFI_AUTH_WPA_PSK
-                in case AP is operating in WEP / WPA mode.
-
-            config WIFI_AUTH_OPEN
-                bool "OPEN"
-            config WIFI_AUTH_WEP
-                bool "WEP"
-            config WIFI_AUTH_WPA_PSK
-                bool "WPA PSK"
-            config WIFI_AUTH_WPA2_PSK
-                bool "WPA2 PSK"
-            config WIFI_AUTH_WPA_WPA2_PSK
-                bool "WPA/WPA2 PSK"
-            config WIFI_AUTH_WPA3_PSK
-                bool "WPA3 PSK"
-            config WIFI_AUTH_WPA2_WPA3_PSK
-                bool "WPA2/WPA3 PSK"
-            config WIFI_AUTH_WAPI_PSK
-                bool "WAPI PSK"
-        endchoice
+                When enable long range, the PHY rate of ESP32 will be 512Kbps or 256Kbps
     endmenu
 
     menu "OTA Configuration"
@@ -99,12 +107,6 @@ menu "Kopter Conifiguration"
             help
                 Maximum time for reception.
     endmenu
-
-    config ENABLE_LONG_RANGE
-        bool "Enable Long Range"
-        default "n"
-        help
-            When enable long range, the PHY rate of ESP32 will be 512Kbps or 256Kbps
 
     config I2C_SDA_PIN
         int "SDA pin"
