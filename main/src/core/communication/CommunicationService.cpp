@@ -66,17 +66,24 @@ void CommunicationService::set_rx_callback(RxCallback rx_cb) noexcept
 
 void CommunicationService::create_rx_task()
 {
-    m_rx_task = std::make_unique<Task>(RX_MESSAGE_TASK_NAME.data(), RX_MESSAGE_TASK_STACK_SIZE, [this]() {
+    m_rx_task = std::make_unique<Task>(RX_MESSAGE_TASK_NAME.data(), RX_MESSAGE_TASK_STACK_SIZE, [this]() -> esp_err_t {
         Message *msg_ptr = nullptr;
 
         while (true) {
             if (xQueueReceive(m_rx_queue, &msg_ptr, portMAX_DELAY) == pdTRUE) {
                 if (msg_ptr && m_rx_cb) {
-                    m_rx_cb(*msg_ptr);
+                    try {
+                        m_rx_cb(*msg_ptr);
+                    } catch (const MessageException &e) {
+                        ESP_LOGE(TAG.data(), "RX callback error: %s", e.what());
+                    } catch (...) {
+                        ESP_LOGE(TAG.data(), "RX callback error: unknown");
+                    }
                     delete msg_ptr;
                 }
             }
         }
+        return ESP_OK; // unreachable, but required by signature
     });
 }
 

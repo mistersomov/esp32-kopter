@@ -16,11 +16,13 @@
 
 #include "pch.hpp"
 #include "Task.hpp"
+#include "esp_log.h"
 
 namespace kopter {
 
 namespace {
 constexpr uint8_t TASK_PRIORITY_DEFAULT = 5;
+constexpr const char *TAG = "[Task]";
 } // namespace
 
 Task::Task(const char *task_name, uint32_t stack_size, TaskFn fn) : m_fn(std::move(fn))
@@ -29,7 +31,9 @@ Task::Task(const char *task_name, uint32_t stack_size, TaskFn fn) : m_fn(std::mo
 }
 
 Task::Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, TaskFn fn)
+    : m_fn(std::move(fn))
 {
+    xTaskCreate(Task::task_trampoline, task_name, stack_size, this, priority, nullptr);
 }
 
 Task::Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, BaseType_t coreId, TaskFn fn)
@@ -43,7 +47,18 @@ void Task::task_trampoline(void *param)
     auto *self = static_cast<Task *>(param);
     assert(self);
 
-    self->m_fn();
+    try {
+        esp_err_t rc = self->m_fn ? self->m_fn() : ESP_OK;
+        if (rc != ESP_OK) {
+            ESP_LOGE(TAG, "Task function returned error: %s", esp_err_to_name(rc));
+        }
+    }
+    catch (const std::exception &e) {
+        ESP_LOGE(TAG, "Unhandled exception in task: %s", e.what());
+    }
+    catch (...) {
+        ESP_LOGE(TAG, "Unhandled non-std exception in task");
+    }
     vTaskDelete(nullptr);
 }
 

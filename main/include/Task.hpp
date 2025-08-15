@@ -16,11 +16,14 @@
 
 #pragma once
 
+#include <functional>
+#include "esp_err.h"
+
 namespace kopter {
 
 class Task {
 public:
-    using TaskFn = std::function<void()>;
+    using TaskFn = std::function<esp_err_t()>;
 
     Task(const char *task_name, uint32_t stack_size, TaskFn fn);
     Task(const char *task_name, uint32_t stack_size, UBaseType_t priority, TaskFn fn);
