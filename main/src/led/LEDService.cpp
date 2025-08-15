@@ -105,10 +105,19 @@ void LEDService::blink(LEDColor color, uint32_t duration)
     stop_blink();
 
     m_blink_running = true;
-    m_blink_task.emplace(BLINK_TASK_NAME.data(), BLINK_TASK_STACK_SIZE, [this, color, duration]() {
+    m_blink_task.emplace(BLINK_TASK_NAME.data(), BLINK_TASK_STACK_SIZE, [this, color, duration]() -> esp_err_t {
         while (m_blink_running.load(std::memory_order_acquire)) {
-            blink_once(color, duration);
+            try {
+                blink_once(color, duration);
+            } catch (const LEDException &e) {
+                ESP_LOGE(TAG.data(), "Blink task error: %s", e.what());
+                return e.error;
+            } catch (...) {
+                ESP_LOGE(TAG.data(), "Blink task error: unknown");
+                return ESP_FAIL;
+            }
         }
+        return ESP_OK;
     });
 }
 

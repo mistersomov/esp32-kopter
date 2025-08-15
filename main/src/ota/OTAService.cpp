@@ -50,9 +50,18 @@ void OTAService::check_and_update()
     check_call<OTAException>(fetch_ota_info());
 
     if (has_newer_version()) {
-        new Task(TASK_NAME.data(), TASK_STACK_SIZE, [this]() {
+        new Task(TASK_NAME.data(), TASK_STACK_SIZE, [this]() -> esp_err_t {
             ESP_LOGI(TAG.data(), "Update available: %s", m_meta_info.url.c_str());
-            perform_update();
+            try {
+                perform_update();
+                return ESP_OK;
+            } catch (const KopterException &e) {
+                ESP_LOGE(TAG.data(), "Update task failed: %s", e.what());
+                return e.error;
+            } catch (...) {
+                ESP_LOGE(TAG.data(), "Update task failed: unknown error");
+                return ESP_FAIL;
+            }
         });
     }
     else {
