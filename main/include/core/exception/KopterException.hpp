@@ -18,12 +18,30 @@
 
 #include "esp_exception.hpp"
 
+#include <string_view>
+
 namespace kopter {
 
 struct KopterException : public idf::ESPException {
     KopterException(esp_err_t error) : idf::ESPException(error)
     {
     }
+
+    KopterException(esp_err_t error, const std::string_view &msg) : idf::ESPException(error), message{std::move(msg)}
+    {
+    }
+
+    const char *what() const noexcept override
+    {
+        if (message.empty()) {
+            return esp_err_to_name(error);
+        }
+        else {
+            return message.data();
+        }
+    }
+
+    std::string_view message;
 };
 
 } // namespace kopter

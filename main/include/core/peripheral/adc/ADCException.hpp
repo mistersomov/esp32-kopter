@@ -18,6 +18,12 @@
 
 namespace kopter {
 struct ADCException : public KopterException {
-    ADCException(esp_err_t error);
+    ADCException(esp_err_t error) : KopterException(error)
+    {
+    }
+
+    ADCException(esp_err_t error, const std::string_view &msg) : KopterException(error, std::move(msg))
+    {
+    }
 };
 } // namespace kopter
